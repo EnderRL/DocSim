@@ -1,66 +1,18 @@
 #include "kshingle.h"
 
-
-KShingleSet::KShingleSet(int k, string source) {
+KShingle::KShingle(int k) {
     this->k = k;
-    //TODO: TRATAR ESPACIOS EN BLANCO PARA LA GENTE QUE ESCRIBE MAL
-    for (unsigned int i = 0; i <= source.size()-k ; ++i) {
-        kshingles.insert(source.substr(i, k));
+}
+#include <bitset>
 
+uint KShingle::hashKShingle(const string& kshingle) {
+    const uint base = 256;
+    const ull mod = 4294967296;
+    ull sum = 0;
+    for (uint i = 0; i < kshingle.size()-1; ++i) {
+        sum = (((sum +  kshingle[i])%mod)*base)%mod;
+        sum = sum%mod;
     }
+    sum += kshingle[kshingle.size()-1];
+    return sum%mod;
 }
-
-double KShingleSet::jaccard(const KShingleSet &B) {
-    int unionSize = 0;
-    int interSize = 0;
-    Iterator i = kshingles.begin();
-    int ipos = 0;
-    Iterator j = B.kshingles.cbegin();
-    int jpos = 0;
-    while (i != kshingles.end() and j != B.kshingles.cend()) {
-        if (*i == *j) {
-            ++interSize;
-            ++i;
-            ++ipos;
-            ++j;
-            ++jpos;
-        }
-        else if (*i < *j) {
-            ++i;
-            ++ipos;
-        }
-        else {
-            ++j;
-            ++jpos;
-        }
-        ++unionSize;
-    }
-    if (i == kshingles.end()) {
-        unionSize += B.kshingles.size() - jpos;
-    }
-    else if (j == B.kshingles.end()) {
-        unionSize += kshingles.size() - ipos;
-    }
-    return (double)interSize/unionSize;
-}
-
-
-void KShingleSet::toString() {
-    cout << "k = " << k << endl;
-    for (string s : kshingles) {
-        cout << s << endl;
-    }
-}
-
-bool KShingleSet::addKShingle(string shingle) {
-    return true;
-}
-
-bool KShingleSet::removeKShingle(string shingle) {
-    return false;
-}
-
-int KShingleSet::size() {
-    return kshingles.size();
-}
-

@@ -7,11 +7,15 @@ CONFIG -= qt
 QMAKE_CXXFLAGS += -std=c++11
 
 SOURCES += main.cpp \
-    kshingle.cpp
+    kshingle.cpp \
+    kshingleset.cpp \
+    kshinglehash.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
 
 HEADERS += \
-    kshingle.h
+    kshingle.h \
+    kshingleset.h \
+    kshinglehash.h
 

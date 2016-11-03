@@ -1,11 +1,6 @@
 #include <iostream>
-#include "kshingle.h"
+#include "kshingleset.h"
 using namespace std;
-
-
-int jaccard(KShingleSet A, KShingleSet B) {
-
-}
 
 void leeString(string& text) {
     cout << "Introduce la string a analizar" << endl;
@@ -15,7 +10,11 @@ void leeString(string& text) {
 
 
 int main() {
-    cout << "Empieza el algoritmo de la similitud de Jaccard." << endl;
+    cout << "Introduce la string a convertir a numero" << endl;
+    string text;
+    leeString(text);
+    cout << "Resultado: " << KShingle::hashKShingle(text) << endl;
+    /*cout << "Empieza el algoritmo de la similitud de Jaccard." << endl;
     cout << "Introduce la k deseada." << endl;
     int k;
     cin >> k;
@@ -24,8 +23,11 @@ int main() {
     getline(cin,text1);
     leeString(text1);
     leeString(text2);
-    KShingleSet kshingleset1(k,text1);
-    KShingleSet kshingleset2(k,text2);
-    cout << "El coeficiente de jaccard es " << kshingleset1.jaccard(kshingleset2) << endl;
+    KShingleSet kshingleset1(k, text1);
+    KShingleSet kshingleset2(k, text2);
+    kshingleset1.print();
+    cout << endl;
+    kshingleset2.print();
+    cout << "El coeficiente de jaccard es " << kshingleset1.jaccard(kshingleset2) << endl;*/
 }
 
