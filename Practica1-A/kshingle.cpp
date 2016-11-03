@@ -3,7 +3,6 @@
 KShingle::KShingle(int k) {
     this->k = k;
 }
-#include <bitset>
 
 uint KShingle::hashKShingle(const string& kshingle) {
     const uint base = 256;
