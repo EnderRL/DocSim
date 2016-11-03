@@ -1,5 +1,6 @@
 #include <iostream>
 #include "kshingleset.h"
+#include "kshinglehash.h"
 using namespace std;
 
 void leeString(string& text) {
