@@ -1,6 +1,7 @@
 #include <iostream>
 #include "kshingleset.h"
 #include "kshinglehash.h"
+#include "minhashsignatures.h"
 using namespace std;
 
 void leeString(string& text) {
@@ -9,13 +10,8 @@ void leeString(string& text) {
     cout << "La string es: " << text << endl;
 }
 
-
-int main() {
-    cout << "Introduce la string a convertir a numero" << endl;
-    string text;
-    leeString(text);
-    cout << "Resultado: " << KShingle::hashKShingle(text) << endl;
-    /*cout << "Empieza el algoritmo de la similitud de Jaccard." << endl;
+void testKShingles() {
+    cout << "Empieza el algoritmo de la similitud de Jaccard." << endl;
     cout << "Introduce la k deseada." << endl;
     int k;
     cin >> k;
@@ -29,6 +25,21 @@ int main() {
     kshingleset1.print();
     cout << endl;
     kshingleset2.print();
-    cout << "El coeficiente de jaccard es " << kshingleset1.jaccard(kshingleset2) << endl;*/
+    cout << "El coeficiente de jaccard es " << kshingleset1.jaccard(kshingleset2) << endl;
+}
+
+void testHashKShingles() {
+    cout << "Introduce la string a convertir a numero" << endl;
+    string text;
+    leeString(text);
+    cout << "Resultado: " << KShingle::hashKShingle(text) << endl;
+}
+
+void testMinHash() {
+
+}
+
+int main() {
+
 }
 
