@@ -36,10 +36,27 @@ void testHashKShingles() {
 }
 
 void testMinHash() {
+    string s1, s2;
+    leeString(s1);
+    leeString(s2);
+    cout << "Introduce la k deseada." << endl;
+    int k;
+    cin >> k;
+    cout << "K es " << k << endl;
+    cout << "Introduce t" << endl;
+    uint t;
+    cin >> t;
+    KShingleSet kshingleset1(k, s1);
+    KShingleSet kshingleset2(k, s2);
+    cout << "El coeficiente de jaccard es con la manera guay " << kshingleset1.jaccard(kshingleset2) << endl;
+
+    vector<string> textos = {s1,s2};
+    MinHashSignatures minHashSignatures(t,k,textos);
+    cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0,1) << endl;
 
 }
 
 int main() {
-
+    testMinHash();
 }
 
