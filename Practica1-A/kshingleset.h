@@ -14,6 +14,7 @@ class KShingleSet : public KShingle {
 
 public:
     KShingleSet(int k, const string& source);
+    KShingleSet(int k, const char* source, uint size);
     int size();
     double jaccard(const KShingle& Bs);
     void print();

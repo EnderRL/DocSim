@@ -16,6 +16,7 @@ class MinHashSignatures {
     matrix signatures;
 public:
     MinHashSignatures(uint t, uint k, vector<string> texts);
+    MinHashSignatures(uint t, uint k, vector<char*> texts, vector<uint> textSize);
     double jaccard(uint a, uint b);
 };
 
