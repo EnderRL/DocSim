@@ -1,4 +1,5 @@
 #include "minhashsignatures.h"
+#include "kshinglemap.h"
 
 MinHashSignatures::MinHashSignatures(uint t, uint k, vector<string> texts) {
     hashFunctions = vector<pair<uint, uint>>(t);
@@ -31,7 +32,9 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, vector<string> texts) {
     }
 }
 
-MinHashSignatures::MinHashSignatures(uint t, uint k, vector<char *> texts, vector<uint> textSize) {
+
+
+/*MinHashSignatures::MinHashSignatures(uint t, uint k, vector<char *> texts, vector<uint> textSize) {
     hashFunctions = vector<pair<uint, uint>>(t);
     signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
     srand(time(NULL));
@@ -58,6 +61,54 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, vector<char *> texts, vecto
         }
         ++j;
     }
+
+    for (uint i = 0; i < t; ++i) {
+        for (uint j = 0; j < texts.size(); ++j) {
+            cout << signatures[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+double MinHashSignatures::jaccard(uint a, uint b) {
+    uint sum = 0;
+    for (uint i = 0; i < signatures.size(); ++i) {
+        if (signatures[i][a] == signatures[i][b]) ++sum;
+    }
+    cout << "Hay " << sum << " filas iguales y " << signatures.size() << " filas en total." << endl;
+    return double(sum)/signatures.size();
+}*/
+
+MinHashSignatures::MinHashSignatures(uint t, uint k, vector<char *> texts, vector<uint> textSize) {
+    hashFunctions = vector<pair<uint, uint>>(t);
+    signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
+    srand(time(NULL));
+    for (uint i = 0; i < t; ++i) {
+        hashFunctions[i] = pair<uint, uint>(rand(), rand());
+        cout << "H" << i << " es " << hashFunctions[i].first << "x + " << hashFunctions[i].second << " mod 2^32" << endl;
+    }
+    kshinglemap mapa(k);
+    uint j = 0;
+
+    for (char* text : texts) {
+        mapa.add(j,text,textSize[j]);
+        ++j;
+    }
+    int indice = 0;
+    for (pair<uint,list<uint>> kShingleActual: mapa.mapa) {
+
+        for (uint row = 0; row < t; ++row) {
+                pair<uint, uint> p = hashFunctions[row];
+                uint permutedRow = ((p.first*indice)%mapa.size() + p.second)%mapa.size();
+
+                for (uint documento :  kShingleActual.second) {
+                    signatures[row][documento] = min(permutedRow, signatures[row][documento]);
+                }
+        }
+
+        ++indice;
+    }
+
 
     for (uint i = 0; i < t; ++i) {
         for (uint j = 0; j < texts.size(); ++j) {

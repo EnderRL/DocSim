@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include "kshingleset.h"
-#include "kshinglehash.h"
 #include "minhashsignatures.h"
 
 void leeString(string& text) {
