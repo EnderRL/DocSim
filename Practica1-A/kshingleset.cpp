@@ -7,6 +7,17 @@ KShingleSet::KShingleSet(int k, const string &source) : KShingle(k) {
     }
 }
 
+KShingleSet::KShingleSet(int k, const char* source, uint size) : KShingle(k) {
+    char subString[k];
+    for (uint i = 0; i <= size-k; ++i) {
+        for (int j = 0; j < k; ++j) {
+            subString[j] =  source[i+j];
+        }
+        string aux(subString, k);
+        kshingles.insert(aux);
+    }
+}
+
 double KShingleSet::jaccard(const KShingle &Bs) {
     const KShingleSet& B = (KShingleSet&)Bs;
     int unionSize = 0;

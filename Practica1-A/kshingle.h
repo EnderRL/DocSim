@@ -13,6 +13,7 @@ protected:
 public:
     KShingle(int k);
     static uint hashKShingle(const string& kshingle);
+    static uint hashKShingle(const char* kshingle, uint size);
     virtual double jaccard(const KShingle& B) = 0;
     virtual int size() = 0;
     virtual void print() = 0;
