@@ -85,21 +85,18 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, vector<char *> texts, vecto
     srand(time(NULL));
     for (uint i = 0; i < t; ++i) {
         hashFunctions[i] = pair<uint, uint>(rand(), rand());
-        cout << "H" << i << " es " << hashFunctions[i].first << "x + " << hashFunctions[i].second << " mod 2^32" << endl;
+        cout << "H" << i << " es " << hashFunctions[i].first << "x + " << hashFunctions[i].second << " mod algo" << endl;
     }
     kshinglemap mapa(k);
-    uint j = 0;
 
-    for (char* text : texts) {
-        mapa.add(j,text,textSize[j]);
-        ++j;
-    }
+    for (uint j = 0; j < texts.size(); ++j) mapa.add(j, texts[j], textSize[j]);
+    cout << "kshingles total " << mapa.mapa.size() << endl;
     int indice = 0;
-    for (pair<uint,list<uint>> kShingleActual: mapa.mapa) {
+    for (pair<uint,list<uint>> kShingleActual : mapa.mapa) {
 
         for (uint row = 0; row < t; ++row) {
                 pair<uint, uint> p = hashFunctions[row];
-                uint permutedRow = ((p.first*indice)%mapa.size() + p.second)%mapa.size();
+                uint permutedRow = ((p.first*indice)%mapa.mapa.size() + p.second)%mapa.mapa.size();
 
                 for (uint documento :  kShingleActual.second) {
                     signatures[row][documento] = min(permutedRow, signatures[row][documento]);

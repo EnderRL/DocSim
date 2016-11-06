@@ -16,13 +16,7 @@ void kshinglemap::add(uint document, const char* source, uint size) {
         string aux(subString, k);
         uint hashed = KShingle::hashKShingle(aux);
         mapa[hashed].push_back(document);
-
     }
-    return;
-}
-
-int kshinglemap:: size() {
-    return mapa.size();
 }
 
 void kshinglemap::print() {
