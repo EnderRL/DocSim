@@ -9,15 +9,17 @@ QMAKE_CXXFLAGS += -std=c++11
 SOURCES += main.cpp \
     kshingle.cpp \
     kshingleset.cpp \
-    kshinglehash.cpp \
-    minhashsignatures.cpp
+    minhashsignatures.cpp \
+    kshinglemap.cpp \
+    lsh.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
 
 HEADERS += \
     kshingle.h \
+    minhashsignatures.h \
+    kshinglemap.h \
     kshingleset.h \
-    kshinglehash.h \
-    minhashsignatures.h
+    lsh.h
 

@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <ctime>
+#include <unordered_set>
 #include "kshingle.h"
 using namespace std;
 
