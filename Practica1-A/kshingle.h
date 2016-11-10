@@ -6,6 +6,8 @@ using namespace std;
 
 typedef unsigned int uint;
 typedef unsigned long long ull;
+const ull MAX_SIZE_4B =  4294967296;
+
 
 class KShingle {
 protected:
