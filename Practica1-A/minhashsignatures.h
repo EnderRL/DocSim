@@ -7,6 +7,7 @@
 #include <ctime>
 #include <unordered_set>
 #include "kshingle.h"
+#include <fstream>
 using namespace std;
 
 typedef unsigned int uint;
@@ -17,7 +18,7 @@ class MinHashSignatures {
     matrix signatures;
 public:
     MinHashSignatures(uint t, uint k, vector<string> texts);
-    MinHashSignatures(uint t, uint k, vector<char*> texts, vector<uint> textSize);
+    MinHashSignatures(uint t, uint k, vector<string> texts);
     double jaccard(uint a, uint b);
 };
 

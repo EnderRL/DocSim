@@ -6,13 +6,14 @@ using namespace std;
 
 typedef unsigned int uint;
 typedef unsigned long long ull;
-const ull MAX_SIZE_4B =  4294967296;
 
 
 class KShingle {
 protected:
     int k;
 public:
+    static const ull MAX_SIZE_4B = 4294967296;
+
     KShingle(int k);
     static uint hashKShingle(const string& kshingle);
     static uint hashKShingle(const char* kshingle, uint size);

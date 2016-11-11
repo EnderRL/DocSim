@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "kshingleset.h"
+#include "lsh.h"
 #include "minhashsignatures.h"
 #include <list>
 
@@ -105,18 +106,23 @@ void testMinHash(uint numText, const string& name) {
 
 }
 
-void teslLSH() {
+void testLSH() {
 
-    cout << "Introduce la k deseada." << endl;
-    int k;
-    cin >> k;
-    cout << "Introduce la b deseada." << endl;
-    int b;
-    cin >> b;
+    vector<vector<uint>> matrix = { {0,1,2},
+                                    {1,1,1},
+                                    {2,2,2},
 
+                                    {0,0,2},
+                                    {1,1,2},
+                                    {2,2,2},
+
+                                    {3,3,3},
+                                    {4,4,4},
+                                    {5,5,5}};
+    LSH lsh(matrix, 3, 3, 10);
 }
 
 int main() {
-    testMinHash(2, "lorem");
+    testLSH();
 }
 

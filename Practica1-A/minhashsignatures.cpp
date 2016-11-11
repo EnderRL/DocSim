@@ -1,38 +1,6 @@
 #include "minhashsignatures.h"
 #include "kshinglemap.h"
 
-MinHashSignatures::MinHashSignatures(uint t, uint k, vector<string> texts) {
-    hashFunctions = vector<pair<uint, uint>>(t);
-    signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
-    srand(time(NULL));
-    for (uint i = 0; i < t; ++i) {
-        hashFunctions[i] = pair<uint, uint>(rand(), rand());
-        cout << "H" << i << " es " << hashFunctions[i].first << "x + " << hashFunctions[i].second << " mod 2^32" << endl;
-    }
-    const ull mod = 4294967296;
-    uint j = 0;
-    for (string text : texts) {
-        for (uint i = 0; i <= text.size()-k; ++i) {
-            ull hashed = KShingle::hashKShingle(text.substr(i, k));
-            cout << "He sacado el kshingle " << text.substr(i,k) << " del texto " << j << " y su hasheado me ha dao " << hashed << endl;
-            for (uint row = 0; row < t; ++row) {
-                pair<uint, uint> p = hashFunctions[row];
-                uint permutedRow = ((p.first*hashed)%mod + p.second)%mod;
-                signatures[row][j] = min(permutedRow, signatures[row][j]);
-            }
-        }
-        ++j;
-
-    }
-
-    for (uint i = 0; i < t; ++i) {
-        for (uint j = 0; j < texts.size(); ++j) {
-            cout << signatures[i][j] << " ";
-        }
-        cout << endl;
-    }
-}
-
 bool isPrime(uint number) {
 
     if (number == 2 || number == 3)
@@ -79,7 +47,8 @@ int nextPrime(uint a) {
     return a;
 }
 
-MinHashSignatures::MinHashSignatures(uint t, uint k, vector<char *> texts, vector<uint> textSize) {
+MinHashSignatures::MinHashSignatures(uint t, uint k, vector<string> texts) {
+
     hashFunctions = vector<pair<uint, uint>>(t);
     signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
 
@@ -93,7 +62,19 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, vector<char *> texts, vecto
     unordered_set<uint> repetidos;
     uint numRepetidos = 0;
 
-    for (uint j = 0; j < texts.size(); ++j) mapa.add(j, texts[j], textSize[j]);
+    for (uint j = 0; j < texts.size(); ++j) {
+        ifstream input(texts[j]);
+
+        input.seekg(ios::end);
+        uint size = input.tellg();
+        input.seekg(ios::beg);
+
+        char* text = new char[size];
+        input.read(text, size);
+        mapa.add(j, text, size);
+        delete text;
+        input.close();
+    }
     cout << "kshingles total " << mapa.mapa.size() << endl;
 
     //uint modPrime = mapa.mapa.size();
