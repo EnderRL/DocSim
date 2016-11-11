@@ -1,5 +1,4 @@
 #include "minhashsignatures.h"
-#include "kshinglemap.h"
 
 bool isPrime(uint number) {
 
@@ -47,51 +46,94 @@ int nextPrime(uint a) {
     return a;
 }
 
-MinHashSignatures::MinHashSignatures(uint t, uint k, vector<string> texts) {
+void MinHashSignatures::RandomPermutations(const KShingleMap &map) {
 
-    hashFunctions = vector<pair<uint, uint>>(t);
+    uint t = signatures.size();
+    vector<list<uint>> permutationLists(t);
+
+    for (uint i = 0; i < t; ++i) {
+        list<uint>& permutationList = permutationLists[i];
+        for (uint j = 0; j < map.mapa.size(); ++j) permutationList.push_back(j);
+    }
+
+    uint indice = 0;
+
+    for (pair<uint,list<uint>> kShingleActual : map.mapa) {
+
+        for (uint row = 0; row < t; ++row) {
+            list<uint>& permutationList = permutationLists[row];
+
+            uint randomIndex = rand()%permutationList.size();
+            list<uint>::iterator it = permutationList.begin();
+
+            for (uint i = 0; i < randomIndex; ++i) ++it;
+
+            uint permutedRow = *it;
+            permutationList.erase(it);
+
+            for (uint documento :  kShingleActual.second) {
+                signatures[row][documento] = min(permutedRow, signatures[row][documento]);
+            }
+        }
+        ++indice;
+    }
+
+}
+
+MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode) {
+
+    KShingleMap mapa(k);
     signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
 
+    for (uint i = 0; i < texts.size(); ++i) {
+        ifstream input(texts[i]);
+
+        input.seekg(0, ios::end);
+        uint size = input.tellg();
+        input.seekg(0, ios::beg);
+
+        char* text = new char[size];
+        input.read(text, size);
+        mapa.add(i, text, size);
+
+        delete text;
+        input.close();
+    }
+
+    cout << "kshingles total " << mapa.mapa.size() << endl;
+
     srand(time(NULL));
+
+    if (mode == Random) {
+        RandomPermutations(mapa);
+        return;
+    }
+
+    uint numRepetidos = 0;
+    unordered_set<uint> repeated;
+    hashFunctions = vector<pair<uint, uint>>(t);
 
     for (uint i = 0; i < t; ++i) {
         hashFunctions[i] = pair<uint, uint>(rand(), rand());
     }
 
-    kshinglemap mapa(k);
-    unordered_set<uint> repetidos;
-    uint numRepetidos = 0;
+    uint mod;
+    if (mode == HashWithPrime) mod = nextPrime(mapa.mapa.size());
+    else mod = mapa.mapa.size();
 
-    for (uint j = 0; j < texts.size(); ++j) {
-        ifstream input(texts[j]);
-
-        input.seekg(ios::end);
-        uint size = input.tellg();
-        input.seekg(ios::beg);
-
-        char* text = new char[size];
-        input.read(text, size);
-        mapa.add(j, text, size);
-        delete text;
-        input.close();
-    }
-    cout << "kshingles total " << mapa.mapa.size() << endl;
-
-    //uint modPrime = mapa.mapa.size();
-    uint modPrime = nextPrime(mapa.mapa.size());
-    int indice = 0;
+    uint indice = 0;
 
     for (pair<uint,list<uint>> kShingleActual : mapa.mapa) {
         for (uint row = 0; row < t; ++row) {
             pair<uint, uint> p = hashFunctions[row];
 
-            uint permutedRow = ((p.first*indice)%modPrime + p.second)%modPrime;
+            uint permutedRow = ((p.first*indice)%mod + p.second)%mod;
 
             if (row == 0) {
-                unordered_set<uint>::iterator it = repetidos.find(permutedRow);
+                unordered_set<uint>::iterator it = repeated.find(permutedRow);
 
-                if (it != repetidos.end()) ++numRepetidos;
-                else repetidos.insert(permutedRow);
+                if (it != repeated.end()) ++numRepetidos;
+                else repeated.insert(permutedRow);
             }
 
             for (uint documento :  kShingleActual.second) {

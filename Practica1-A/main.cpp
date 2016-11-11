@@ -71,44 +71,23 @@ void testHashKShingles() {
     cout << "Resultado: " << KShingle::hashKShingle(text) << endl;
 }
 
-void testMinHash(uint numText, const string& name) {
-    vector<char*> texts(numText);
-    vector<uint> textSize(numText);
-
-    for (uint i = 0; i < numText; ++i) {
-        ifstream input("../" + name + to_string(i) + ".txt");
-
-        input.seekg(0, ios::end);
-        uint size = input.tellg();
-        input.seekg(ios::beg);
-
-        char* text = new char[size];
-        input.read(text, size);
-
-        texts[i] = text;
-        textSize[i] = size;
-
-        input.close();
-    }
+void testMinHash(const vector<string>& names) {
 
     cout << "Introduce la k deseada." << endl;
-    int k;
+    uint k;
     cin >> k;
     cout << "Introduce t" << endl;
     uint t;
     cin >> t;
-    KShingleSet kshingleset1(k, texts[0], textSize[0]);
-    KShingleSet kshingleset2(k, texts[1], textSize[1]);
-    cout << "El coeficiente de jaccard es con la manera guay " << kshingleset1.jaccard(kshingleset2) << endl;
 
-    MinHashSignatures minHashSignatures(t, k, texts, textSize);
+    MinHashSignatures minHashSignatures(t, k, names, HashWithPrime);
     cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
 
 }
 
 void testLSH() {
 
-    vector<vector<uint>> matrix = { {0,1,2},
+    const vector<vector<uint>> matrix = { {0,1,2},
                                     {1,1,1},
                                     {2,2,2},
 
@@ -119,10 +98,12 @@ void testLSH() {
                                     {3,3,3},
                                     {4,4,4},
                                     {5,5,5}};
-    LSH lsh(matrix, 3, 3, 10);
+    //TODO: El LSH no me funciona y no se por qué.
+    //LSH lsh(matrix, 3, 3, 10);
 }
 
 int main() {
-    testLSH();
+    vector<string> names = {"../lorem0.txt", "../lorem1.txt" };
+    testMinHash(names);
 }
 

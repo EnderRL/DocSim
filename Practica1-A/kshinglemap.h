@@ -6,12 +6,12 @@ using namespace std;
 
 typedef unsigned int uint;
 
-class kshinglemap {
+class KShingleMap {
     int k;
 public:
     unordered_map<uint,list<uint>> mapa;
 
-    kshinglemap(int k);
+    KShingleMap(int k);
     void add(uint document, const char* source, uint size);
     void print();
 };

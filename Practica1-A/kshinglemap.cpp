@@ -3,11 +3,11 @@
 #include <list>
 #include <iostream>
 
-kshinglemap::kshinglemap(int k) {
+KShingleMap::KShingleMap(int k) {
     this->k = k;
 }
 
-void kshinglemap::add(uint document, const char* source, uint size) {
+void KShingleMap::add(uint document, const char* source, uint size) {
     char subString[k];
     for (uint i = 0; i <= size-k; ++i) {
         for (int j = 0; j < k; ++j) {
@@ -19,7 +19,7 @@ void kshinglemap::add(uint document, const char* source, uint size) {
     }
 }
 
-void kshinglemap::print() {
+void KShingleMap::print() {
     unordered_map<uint,list<uint>>::iterator it = mapa.begin();
     while (it != mapa.end()) {
         cout << "El kshingle " << it->first << " esta en los documentos";
