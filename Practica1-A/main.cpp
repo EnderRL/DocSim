@@ -279,7 +279,6 @@ void experimentoMinHash() {
     }
 }
 int main() {
-<<<<<<< HEAD
     vector<string> names1 = {
         "../DataSet Experimento 1/textoDummy.txt",
         "../DataSet Experimento 1/textoDummy.txt",
@@ -296,16 +295,7 @@ int main() {
         "../DataSet Experimento 1/textoPrueba2.txt"};
     testKShingleHashed(names1, names2);
     //generadorTextos("../DataSet Experimento 1/", "textoDummy", 20, 100);
-=======
-    //vector<string> names = {"../textoPrueba1.txt", "../textoPrueba2.txt" };
-    //testKShingleHashed(names[0], names[1]);
-    experimentoMinHash();
 }
-
-/*int main() {
-    vector<string> names = {"../lorem0.txt", "../lorem2.txt" };
-    testKShingleHashed(names[0], names[1]);
-}*/
 
 void primerExperimentoLSH() {
    for (uint mod = 5; mod < 500; mod +=5) {
@@ -363,11 +353,6 @@ void primerExperimentoLSH() {
        steady_clock::time_point t2 = steady_clock::now();
        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
    }
->>>>>>> 12dcc25b36305f2106a50128e3a4df63b40ec97c
 }
-
-/*int main() {
-    primerExperimentoLSH();
-}*/
 
 
