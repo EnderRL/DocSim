@@ -10,7 +10,6 @@ typedef unsigned int uint;
 typedef unsigned long long ull;
 
 class LSH {
-private:
     uint b, r, mod;
     const vector<vector<uint>>* matrix;
     list<list<uint>> posiblesParejas;

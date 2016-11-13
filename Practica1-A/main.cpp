@@ -1,9 +1,9 @@
 #include <iostream>
-#include <fstream>
 #include "kshingleset.h"
 #include "lsh.h"
 #include "minhashsignatures.h"
-#include <list>
+#include "reader.h"
+#include "kshinglesethashed.h"
 
 void generadorTextos(const string& nombre) {
     srand(time(NULL));
@@ -82,7 +82,13 @@ void testMinHash(const vector<string>& names) {
 
     MinHashSignatures minHashSignatures(t, k, names, HashWithPrime);
     cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
+}
 
+void testKShingleHashed(const string& name1, const string& name2) {
+    Reader file1(name1);
+    Reader file2(name2);
+
+    KShingleSetHashed kshingles(9, file1.getText(), file1.getfileSize());
 }
 
 void testLSH() {
@@ -98,12 +104,12 @@ void testLSH() {
                                     {3,3,3},
                                     {4,4,4},
                                     {5,5,5}};
-    //TODO: El LSH no me funciona y no se por qué.
-    //LSH lsh(matrix, 3, 3, 10);
+
+    LSH lsh(matrix, 3, 3, 10);
 }
 
 int main() {
     vector<string> names = {"../lorem0.txt", "../lorem1.txt" };
-    testMinHash(names);
+    testKShingleHashed(names[0], names[1]);
 }
 
