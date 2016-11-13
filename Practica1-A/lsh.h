@@ -22,6 +22,7 @@ class LSH {
 public:
     static const ull MAX_SIZE_4B = 4294967296;
     LSH(const vector<vector<uint>>& matrix, uint b, uint r, uint mod);
+    set<pair<uint, uint> > getSetPairs() const;
 };
 
 #endif // LSH_H

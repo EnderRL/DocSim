@@ -9,10 +9,13 @@
 #include "kshinglemap.h"
 #include <unordered_set>
 #include <fstream>
+#include <list>
+#include "reader.h"
 using namespace std;
 
 enum PermutationMode {
     Hash,
+    Hash32,
     HashWithPrime,
     Random
 };
@@ -21,13 +24,22 @@ typedef unsigned int uint;
 typedef vector<vector<uint>> matrix;
 
 class MinHashSignatures {
-    vector<pair<uint, uint>> hashFunctions;
-    matrix signatures;
 
-    void RandomPermutations(const KShingleMap& map);
+    matrix signatures;
+    uint medida;
+    uint medidaFinal;
+    bool tiempo;
+
+
+    void randomPermutations(const KShingleMap& map, bool tiempo);
 public:
-    MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode);
+    MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode, bool tiempo);
     double jaccard(uint a, uint b);
+    void permutations32(const vector<string>& texts, uint t, uint k, bool tiempo);
+    uint size();
+    uint finalSize();
+    matrix getSignatures() const;
+
 };
 
 #endif // MINHASHSIGNATURES_H

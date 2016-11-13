@@ -46,7 +46,12 @@ int nextPrime(uint a) {
     return a;
 }
 
-void MinHashSignatures::RandomPermutations(const KShingleMap &map) {
+matrix MinHashSignatures::getSignatures() const
+{
+    return signatures;
+}
+
+void MinHashSignatures::randomPermutations(const KShingleMap &map,bool tiempo) {
 
     uint t = signatures.size();
     vector<list<uint>> permutationLists(t);
@@ -56,9 +61,15 @@ void MinHashSignatures::RandomPermutations(const KShingleMap &map) {
         for (uint j = 0; j < map.mapa.size(); ++j) permutationList.push_back(j);
     }
 
+    if(not tiempo) {
+        for(uint i = 0; i < t; ++i) {
+            medida += permutationLists[i].size()*sizeof(uint);
+        }
+    }
+
     uint indice = 0;
 
-    for (pair<uint,list<uint>> kShingleActual : map.mapa) {
+    for (pair<uint,unordered_set<uint>> kShingleActual : map.mapa) {
 
         for (uint row = 0; row < t; ++row) {
             list<uint>& permutationList = permutationLists[row];
@@ -80,12 +91,58 @@ void MinHashSignatures::RandomPermutations(const KShingleMap &map) {
 
 }
 
-MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode) {
+void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint k, bool tiempo) {
 
+    vector<pair<uint, uint>> hashFunctions(t);
+    if(not tiempo) medida += t*2*sizeof(uint);
+    signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
+    srand(time(NULL));
+    for (uint i = 0; i < t; ++i) {
+        hashFunctions[i] = pair<uint, uint>(rand(), rand());
+        //cout << "H" << i << " es " << hashFunctions[i].first << "x + " << hashFunctions[i].second << " mod 2^32" << endl;
+    }
+    const ull mod = 4294967296;
+    uint j = 0;
+    for (string nombreArchivo : texts) {
+        Reader reader(nombreArchivo);
+
+        for (uint i = 0; i <= reader.getfileSize()-k; ++i) {
+            ull hashed = KShingle::hashKShingle(reader.getText(),i,i+k-1);
+            //cout << "He sacado el kshingle " << text.substr(i,k) << " del texto " << j << " y su hasheado me ha dao " << hashed << endl;
+            for (uint row = 0; row < t; ++row) {
+                pair<uint, uint> p = hashFunctions[row];
+                uint permutedRow = ((p.first*hashed)%mod + p.second)%mod;
+                signatures[row][j] = min(permutedRow, signatures[row][j]);
+            }
+        }
+        ++j;
+    }
+
+    /*
+    for (uint i = 0; i < t; ++i) {
+        for (uint j = 0; j < texts.size(); ++j) {
+            cout << signatures[i][j] << " ";
+        }
+        cout << endl;
+    }*/
+}
+
+MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode,bool tiempo) {
+
+    this->tiempo = tiempo;
+    medida = 0;
+    medidaFinal = 0;
     KShingleMap mapa(k);
     signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
 
+    if (mode == Hash32) {
+        permutations32(texts, t, k, tiempo);
+        return;
+    }
+
+    //LEE TEXTOS Y LOS KSHINGLEA
     for (uint i = 0; i < texts.size(); ++i) {
+
         ifstream input(texts[i]);
 
         input.seekg(0, ios::end);
@@ -93,6 +150,7 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
         input.seekg(0, ios::beg);
 
         char* text = new char[size];
+
         input.read(text, size);
         mapa.add(i, text, size);
 
@@ -100,19 +158,23 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
         input.close();
     }
 
-    cout << "kshingles total " << mapa.mapa.size() << endl;
+    if(not tiempo) {
+        for (pair<uint,unordered_set<uint>> it : mapa.mapa) {
+            medida += it.second.size()*sizeof(uint);
+        }
+    }
 
     srand(time(NULL));
 
     if (mode == Random) {
-        RandomPermutations(mapa);
+        randomPermutations(mapa,tiempo);
         return;
     }
 
     uint numRepetidos = 0;
     unordered_set<uint> repeated;
-    hashFunctions = vector<pair<uint, uint>>(t);
-
+    vector<pair<uint, uint>> hashFunctions(t);
+    if(not tiempo) medida += t*2*sizeof(uint);
     for (uint i = 0; i < t; ++i) {
         hashFunctions[i] = pair<uint, uint>(rand(), rand());
     }
@@ -121,9 +183,10 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     if (mode == HashWithPrime) mod = nextPrime(mapa.mapa.size());
     else mod = mapa.mapa.size();
 
+
     uint indice = 0;
 
-    for (pair<uint,list<uint>> kShingleActual : mapa.mapa) {
+    for (pair<uint,unordered_set<uint>> kShingleActual : mapa.mapa) {
         for (uint row = 0; row < t; ++row) {
             pair<uint, uint> p = hashFunctions[row];
 
@@ -143,8 +206,8 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
         ++indice;
     }
 
-    cout << "Repetidos funcion hash 1: " << numRepetidos << endl;
 
+    //cout << "Repetidos funcion hash 1: " << numRepetidos << endl;
     /*for (uint i = 0; i < t; ++i) {
         for (uint j = 0; j < texts.size(); ++j) {
             cout << signatures[i][j] << " ";
@@ -158,6 +221,14 @@ double MinHashSignatures::jaccard(uint a, uint b) {
     for (uint i = 0; i < signatures.size(); ++i) {
         if (signatures[i][a] == signatures[i][b]) ++sum;
     }
-    cout << "Hay " << sum << " filas iguales y " << signatures.size() << " filas en total." << endl;
+   // cout << "Hay " << sum << " filas iguales y " << signatures.size() << " filas en total." << endl;
     return double(sum)/signatures.size();
+}
+
+uint MinHashSignatures::size(){
+    return medida + finalSize();
+}
+
+uint MinHashSignatures::finalSize() {
+    return signatures.size()*signatures[0].size()*sizeof(uint);
 }

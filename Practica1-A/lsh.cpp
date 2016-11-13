@@ -16,7 +16,7 @@ LSH::LSH(const vector<vector<uint>>& matrix, uint b, uint r, uint mod) {
         }
     }
 
-    for (uint i = 0; i < b; ++i) {
+    /*for (uint i = 0; i < b; ++i) {
         cout << "Banda " << i << endl;
         for (uint j = 0; j < mod; ++j) {
             for (uint value : tablaHash[i][j]) {
@@ -24,12 +24,18 @@ LSH::LSH(const vector<vector<uint>>& matrix, uint b, uint r, uint mod) {
             }
             cout << endl;
         }
-    }
+    }*/
     tablaHash.clear();
 
+    /*
     for (pair<uint, uint> p : setPairs)  {
         cout << p.first << " " << p.second << endl;
-    }
+    }*/
+}
+
+set<pair<uint, uint> > LSH::getSetPairs() const
+{
+    return setPairs;
 }
 
 void LSH::insertHashTable(int j, int k) {
