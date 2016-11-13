@@ -2,6 +2,10 @@
 
 KShingleSetHashed::KShingleSetHashed(int k, const char* source, uint size) : KShingle(k) {
 
+    for (uint i = 0; i < size; ++i) cout << source[i];
+
+    cout << endl;
+
     for (uint i = 0; i <= size-k; ++i) {
         uint result = hashKShingle(source, i, i+k-1);
         kshingles.insert(result);
