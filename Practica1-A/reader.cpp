@@ -11,6 +11,7 @@ Reader::Reader(const string& fileName) {
     fileText = new char[fileSize];
 
     input.read(fileText, fileSize);
+    input.close();
 }
 
 char* Reader::getText() {

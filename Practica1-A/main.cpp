@@ -7,6 +7,65 @@
 #include "kshinglesethashed.h"
 using namespace chrono;
 
+ull holdrand = 1;
+
+void userSrand(uint seed) {
+    holdrand = (uint)seed;
+}
+
+uint userRand() {
+    const uint m = 67108864;
+    const uint a = 26353589;
+    const uint c = 14181771;
+    holdrand = (a*holdrand + c) % m;
+    return holdrand;
+}
+
+
+void generadorTextos(const string& path, const string &nombre, uint numTexts, uint increment) {
+    srand(time(NULL));
+    userSrand(time(NULL));
+    Reader input(path + nombre + ".txt");
+
+    char* text = input.getText();
+    uint size = input.getfileSize();
+    char* copy = new char[input.getfileSize()];
+    uint numIterations;
+
+    for (uint j = 0; j < numTexts; ++j) {
+        numIterations = increment*j + 10;
+        memcpy(copy, text, input.getfileSize());
+        ofstream output(path + nombre + "Random" + to_string(j) + ".txt");
+
+        for (uint i = 0; i < numIterations; ++i) {
+            uint randomSize = rand()%6 + 1;
+
+            if (rand()%10 <= 8) {
+                uint indexRandom1 = userRand()%size;
+                uint indexRandom2 = userRand()%size;
+                if (indexRandom1 > size-randomSize) indexRandom1 = size-randomSize;
+                if (indexRandom2 > size-randomSize) indexRandom2 = size-randomSize;
+
+                for (uint k = 0; k < randomSize; ++k) {
+                    char aux = copy[indexRandom1+k];
+                    copy[indexRandom1+k] = copy[indexRandom2+k];
+                    copy[indexRandom2+k] = aux;
+                }
+            }
+            else {
+                uint indexRandom = userRand()%size;
+                if (indexRandom > size-randomSize) indexRandom = size-randomSize;
+
+                for (uint k = indexRandom; k < indexRandom+randomSize; ++k) {
+                    copy[k] = rand()%128;
+                }
+            }
+        }
+        output.write(copy, input.getfileSize());
+        output.close();
+    }
+}
+
 void generadorTextos(const string& nombre) {
     srand(time(NULL));
     ifstream input("../" + nombre + ".txt");
@@ -86,39 +145,46 @@ void testMinHash(const vector<string>& names) {
     cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
 }
 
-void testKShingleHashed(const string& name1, const string& name2) {
+void testKShingleHashed(const vector<string>& name1, const vector<string>& name2) {
     ofstream output("../Resultados experimentos/Experimentos Jaccard Similarity/jaccardsimilarity.txt");
 
     output << "Hashed time\tHashed space\tHashed res\tNo Hashed time\tNo Hashed space\tNo Hasehd res" << endl;
+    for (uint i = 0; i < name1.size(); ++i) {
+        Reader file1(name1[i]);
+        Reader file2(name2[i]);
 
-    Reader file1(name1);
-    Reader file2(name2);
+        cout << "comparando " << name1[i] << " " << name2[i] << endl;
 
-    steady_clock::time_point t1 = steady_clock::now();
+        for (uint k = 4; k <= 10; ++k) {
 
-    KShingleSetHashed kshingles1(9, file1.getText(), file1.getfileSize());
-    KShingleSetHashed kshingles2(9, file2.getText(), file2.getfileSize());
+            steady_clock::time_point t1 = steady_clock::now();
 
-    double jaccardHashed = KShingleSetHashed::jaccard(kshingles1, kshingles2);
+            KShingleSetHashed kshingles1(k, file1.getText(), file1.getfileSize());
+            KShingleSetHashed kshingles2(k, file2.getText(), file2.getfileSize());
 
-    steady_clock::time_point t2 = steady_clock::now();
+            double jaccardHashed = KShingleSetHashed::jaccard(kshingles1, kshingles2);
 
-    duration<double> timeSpan = duration_cast<duration<double>>(t2 - t1);
+            steady_clock::time_point t2 = steady_clock::now();
 
-    output << timeSpan.count() << "\t" << kshingles1.size()+kshingles2.size() << "\t" << jaccardHashed << endl;
+            duration<double> timeSpan = duration_cast<duration<double>>(t2 - t1);
 
-    t1 = steady_clock::now();
+            output << timeSpan.count() << "\t" << kshingles1.size()+kshingles2.size() << "\t" << jaccardHashed << "\t";
 
-    KShingleSet kshinglesSet1(9, file1.getText(), file1.getfileSize());
-    KShingleSet kshinglesSet2(9, file2.getText(), file2.getfileSize());
+            t1 = steady_clock::now();
 
-    double jaccardNoHashed = KShingleSet::jaccard(kshinglesSet1, kshinglesSet2);
+            KShingleSet kshinglesSet1(k, file1.getText(), file1.getfileSize());
+            KShingleSet kshinglesSet2(k, file2.getText(), file2.getfileSize());
 
-    t2 = steady_clock::now();
+            double jaccardNoHashed = KShingleSet::jaccard(kshinglesSet1, kshinglesSet2);
 
-    timeSpan = duration_cast<duration<double>>(t2 - t1);
+            t2 = steady_clock::now();
 
-    output << timeSpan.count() << "\t" << kshinglesSet1.size()+kshinglesSet2.size() << "\t" << jaccardNoHashed << endl;
+            timeSpan = duration_cast<duration<double>>(t2 - t1);
+
+            output << timeSpan.count() << "\t" << kshinglesSet1.size()+kshinglesSet2.size() << "\t" << jaccardNoHashed << endl;
+        }
+        output << endl;
+    }
 }
 
 void testLSH() {
@@ -139,7 +205,21 @@ void testLSH() {
 }
 
 int main() {
-    vector<string> names = {"../lorem0.txt", "../lorem2.txt" };
-    testKShingleHashed(names[0], names[1]);
+    vector<string> names1 = {
+        "../DataSet Experimento 1/textoDummy.txt",
+        "../DataSet Experimento 1/textoDummy.txt",
+        "../DataSet Experimento 1/textoDummy.txt",
+        "../DataSet Experimento 1/textoDummy.txt",
+        "../DataSet Experimento 1/textoDummy.txt",
+        "../DataSet Experimento 1/textoPrueba1.txt"};
+    vector<string> names2 = {
+        "../DataSet Experimento 1/textoDummyRandom0.txt",
+        "../DataSet Experimento 1/textoDummyRandom5.txt",
+        "../DataSet Experimento 1/textoDummyRandom10.txt",
+        "../DataSet Experimento 1/textoDummyRandom15.txt",
+        "../DataSet Experimento 1/textoDummyRandom19.txt",
+        "../DataSet Experimento 1/textoPrueba2.txt"};
+    testKShingleHashed(names1, names2);
+    //generadorTextos("../DataSet Experimento 1/", "textoDummy", 20, 100);
 }
 
