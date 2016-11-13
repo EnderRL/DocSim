@@ -163,6 +163,8 @@ void testKShingleHashed(const vector<string>& name1, const vector<string>& name2
 
         cout << "comparando " << name1[i] << " " << name2[i] << endl;
 
+        output << name1[i] << "\t" << name2[i] << endl;
+
         for (uint k = 4; k <= 10; ++k) {
 
             steady_clock::time_point t1 = steady_clock::now();
@@ -280,21 +282,21 @@ void experimentoMinHash() {
 }
 int main() {
     vector<string> names1 = {
-        "../DataSet Experimento 1/textoDummy.txt",
-        "../DataSet Experimento 1/textoDummy.txt",
-        "../DataSet Experimento 1/textoDummy.txt",
+        "../DataSet Experimento 1/juegodetronos.txt",
+        "../DataSet Experimento 1/juegodetronos.txt",
+        "../DataSet Experimento 1/juegodetronos.txt",
         "../DataSet Experimento 1/textoDummy.txt",
         "../DataSet Experimento 1/textoDummy.txt",
         "../DataSet Experimento 1/textoPrueba1.txt"};
     vector<string> names2 = {
-        "../DataSet Experimento 1/textoDummyRandom0.txt",
-        "../DataSet Experimento 1/textoDummyRandom5.txt",
+        "../DataSet Experimento 1/juegodetronosmodificado.txt",
+        "../DataSet Experimento 1/juegodetronosRandom5.txt",
+        "../DataSet Experimento 1/juegodetronosRandom19.txt",
         "../DataSet Experimento 1/textoDummyRandom10.txt",
-        "../DataSet Experimento 1/textoDummyRandom15.txt",
         "../DataSet Experimento 1/textoDummyRandom19.txt",
         "../DataSet Experimento 1/textoPrueba2.txt"};
     testKShingleHashed(names1, names2);
-    //generadorTextos("../DataSet Experimento 1/", "textoDummy", 20, 100);
+    //generadorTextos("../DataSet Experimento 1/", "juegodetronos", 20, 100);
 }
 
 void primerExperimentoLSH() {
