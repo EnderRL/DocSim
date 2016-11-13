@@ -86,9 +86,15 @@ void testMinHash(const vector<string>& names) {
 
 void testKShingleHashed(const string& name1, const string& name2) {
     Reader file1(name1);
-    Reader file2(name2);
+    KShingleSetHashed kshingles1(3, file1.getText(), file1.getfileSize());
+    KShingleSet kshinglesSet1(3, file1.getText(), file1.getfileSize());
+    file1.deleteText();
 
-    KShingleSetHashed kshingles(9, file1.getText(), file1.getfileSize());
+    Reader file2(name2);
+    KShingleSetHashed kshingles2(3, file2.getText(), file2.getfileSize());
+    KShingleSet kshinglesSet2(3, file1.getText(), file1.getfileSize());
+
+    cout << "Jaccard: " << kshingles1.jaccard(kshingles2) << " " << kshinglesSet1.jaccard(kshinglesSet2) << endl;
 }
 
 void testLSH() {

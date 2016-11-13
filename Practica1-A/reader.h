@@ -15,6 +15,7 @@ public:
     ~Reader();
 
     char* getText();
+    void deleteText();
     uint getfileSize();
 };
 
