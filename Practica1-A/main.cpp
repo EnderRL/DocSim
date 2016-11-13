@@ -1,9 +1,11 @@
 #include <iostream>
+#include <chrono>
 #include "kshingleset.h"
 #include "lsh.h"
 #include "minhashsignatures.h"
 #include "reader.h"
 #include "kshinglesethashed.h"
+using namespace chrono;
 
 void generadorTextos(const string& nombre) {
     srand(time(NULL));
@@ -85,15 +87,24 @@ void testMinHash(const vector<string>& names) {
 }
 
 void testKShingleHashed(const string& name1, const string& name2) {
+    ofstream output("../Resultados experimentos/Experimenos Jaccard Similarity");
+
     Reader file1(name1);
-    KShingleSetHashed kshingles1(9, file1.getText(), file1.getfileSize());
-    KShingleSet kshinglesSet1(9, file1.getText(), file1.getfileSize());
-
     Reader file2(name2);
-    KShingleSetHashed kshingles2(9, file2.getText(), file2.getfileSize());
-    KShingleSet kshinglesSet2(9, file2.getText(), file2.getfileSize());
 
-    cout << "Jaccard: " << kshingles1.jaccard(kshingles2) << " " << kshinglesSet1.jaccard(kshinglesSet2) << endl;
+    steady_clock::time_point t1 = steady_clock::now();
+
+    KShingleSetHashed kshingles1(9, file1.getText(), file1.getfileSize());
+    KShingleSetHashed kshingles2(9, file2.getText(), file2.getfileSize());
+
+    steady_clock::time_point t2 = steady_clock::now();
+
+    duration<double> timeSpan = duration_cast<duration<double>>(t2 - t1);
+
+    cout << "Tiempo Kshingles hasheado: " << timeSpan.count()  << endl;
+
+    KShingleSet kshinglesSet1(9, file1.getText(), file1.getfileSize());
+    KShingleSet kshinglesSet2(9, file2.getText(), file2.getfileSize());
 }
 
 void testLSH() {
@@ -114,7 +125,7 @@ void testLSH() {
 }
 
 int main() {
-    vector<string> names = {"../textoPrueba1.txt", "../textoPrueba2.txt" };
+    vector<string> names = {"../lorem0.txt", "../lorem2.txt" };
     testKShingleHashed(names[0], names[1]);
 }
 

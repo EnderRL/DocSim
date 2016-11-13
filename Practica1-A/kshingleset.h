@@ -15,6 +15,7 @@ public:
     KShingleSet(int k, const string& source);
     KShingleSet(int k, const char* source, uint size);
     uint size();
+    static double jaccard(const KShingleSet& A, const KShingleSet& B);
     double jaccard(const KShingle& Bs);
     void print();
 };
