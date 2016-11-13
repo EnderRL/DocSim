@@ -51,7 +51,7 @@ matrix MinHashSignatures::getSignatures() const
     return signatures;
 }
 
-void MinHashSignatures::RandomPermutations(const KShingleMap &map,bool tiempo) {
+void MinHashSignatures::randomPermutations(const KShingleMap &map,bool tiempo) {
 
     uint t = signatures.size();
     vector<list<uint>> permutationLists(t);
@@ -91,6 +91,39 @@ void MinHashSignatures::RandomPermutations(const KShingleMap &map,bool tiempo) {
 
 }
 
+void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint k, bool tiempo) {
+    vector<pair<uint, uint>> hashFunctions(t);
+    signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
+    srand(time(NULL));
+    for (uint i = 0; i < t; ++i) {
+        hashFunctions[i] = pair<uint, uint>(rand(), rand());
+        cout << "H" << i << " es " << hashFunctions[i].first << "x + " << hashFunctions[i].second << " mod 2^32" << endl;
+    }
+    const ull mod = 4294967296;
+    uint j = 0;
+    for (string text : texts) {
+        for (uint i = 0; i <= text.size()-k; ++i) {
+            ull hashed = KShingle::hashKShingle(text.substr(i, k));
+            //cout << "He sacado el kshingle " << text.substr(i,k) << " del texto " << j << " y su hasheado me ha dao " << hashed << endl;
+            for (uint row = 0; row < t; ++row) {
+                pair<uint, uint> p = hashFunctions[row];
+                uint permutedRow = ((p.first*hashed)%mod + p.second)%mod;
+                signatures[row][j] = min(permutedRow, signatures[row][j]);
+            }
+        }
+        ++j;
+
+    }
+
+    /*
+    for (uint i = 0; i < t; ++i) {
+        for (uint j = 0; j < texts.size(); ++j) {
+            cout << signatures[i][j] << " ";
+        }
+        cout << endl;
+    }*/
+}
+
 MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode,bool tiempo) {
 
     this->tiempo = tiempo;
@@ -99,6 +132,13 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     KShingleMap mapa(k);
     signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
 
+    if (mode == Hash32) {
+        permutations32(texts, t, k, tiempo);
+        return;
+
+    }
+
+    //LEE TEXTOS Y LOS KSHINGLEA
     for (uint i = 0; i < texts.size(); ++i) {
 
         ifstream input(texts[i]);
@@ -125,7 +165,7 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     srand(time(NULL));
 
     if (mode == Random) {
-        RandomPermutations(mapa,tiempo);
+        randomPermutations(mapa,tiempo);
         return;
     }
 
@@ -140,6 +180,7 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     uint mod;
     if (mode == HashWithPrime) mod = nextPrime(mapa.mapa.size());
     else mod = mapa.mapa.size();
+
 
     uint indice = 0;
 

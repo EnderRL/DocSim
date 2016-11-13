@@ -180,8 +180,10 @@ void experimentoMinHash() {
         time_span = duration_cast<duration<double>>(t2 - t1);
         cout << time_span.count() << " ";
 
-        //Medir tiempo Hash Primos
+        //Medir espacio Hash Primos
         testMinHash(names,HashWithPrime,false);
+
+
 
         Reader file1(names[0]);
         Reader file2 (names[1]);
