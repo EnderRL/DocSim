@@ -33,8 +33,11 @@ class MinHashSignatures {
 public:
     MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode, bool tiempo);
     double jaccard(uint a, uint b);
+
     uint size();
     uint finalSize();
+    matrix getSignatures() const;
+
 };
 
 #endif // MINHASHSIGNATURES_H

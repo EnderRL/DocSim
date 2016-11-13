@@ -1,0 +1,3 @@
+Hashed time	Hashed space	Hashed res	No Hashed time	No Hashed space	No Hasehd res
+0.0610232	29464	0.986516
+0.100066	137367	0.991519

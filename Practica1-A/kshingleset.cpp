@@ -90,6 +90,6 @@ void KShingleSet::print() {
 }
 
 uint KShingleSet::size() {
-    return kshingles.size();
+    return kshingles.size()*(k*sizeof(char));
 }
 

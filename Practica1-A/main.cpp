@@ -1,5 +1,8 @@
 #include <iostream>
+#include <fstream>
+#include <ctime>
 #include <chrono>
+#include <cmath>
 #include "kshingleset.h"
 #include "lsh.h"
 #include "minhashsignatures.h"
@@ -93,7 +96,9 @@ void testMinHash(const vector<string>& names, PermutationMode permutationMode,bo
 }
 
 void testKShingleHashed(const string& name1, const string& name2) {
-    ofstream output("../Resultados experimentos/Experimenos Jaccard Similarity");
+    ofstream output("../Resultados experimentos/Experimentos Jaccard Similarity/jaccardsimilarity.txt");
+
+    output << "Hashed time\tHashed space\tHashed res\tNo Hashed time\tNo Hashed space\tNo Hasehd res" << endl;
 
     Reader file1(name1);
     Reader file2(name2);
@@ -103,14 +108,26 @@ void testKShingleHashed(const string& name1, const string& name2) {
     KShingleSetHashed kshingles1(9, file1.getText(), file1.getfileSize());
     KShingleSetHashed kshingles2(9, file2.getText(), file2.getfileSize());
 
+    double jaccardHashed = KShingleSetHashed::jaccard(kshingles1, kshingles2);
+
     steady_clock::time_point t2 = steady_clock::now();
 
     duration<double> timeSpan = duration_cast<duration<double>>(t2 - t1);
 
-    cout << "Tiempo Kshingles hasheado: " << timeSpan.count()  << endl;
+    output << timeSpan.count() << "\t" << kshingles1.size()+kshingles2.size() << "\t" << jaccardHashed << endl;
+
+    t1 = steady_clock::now();
 
     KShingleSet kshinglesSet1(9, file1.getText(), file1.getfileSize());
     KShingleSet kshinglesSet2(9, file2.getText(), file2.getfileSize());
+
+    double jaccardNoHashed = KShingleSet::jaccard(kshinglesSet1, kshinglesSet2);
+
+    t2 = steady_clock::now();
+
+    timeSpan = duration_cast<duration<double>>(t2 - t1);
+
+    output << timeSpan.count() << "\t" << kshinglesSet1.size()+kshinglesSet2.size() << "\t" << jaccardNoHashed << endl;
 }
 
 void testLSH() {
@@ -184,6 +201,7 @@ void experimentoMinHash() {
         names[1] =  "";
     }
 
+
 }
 int main() {
     //vector<string> names = {"../textoPrueba1.txt", "../textoPrueba2.txt" };
@@ -195,4 +213,67 @@ int main() {
     vector<string> names = {"../lorem0.txt", "../lorem2.txt" };
     testKShingleHashed(names[0], names[1]);
 }*/
+
+void primerExperimentoLSH() {
+   for (uint mod = 5; mod < 500; mod +=5) {
+       steady_clock::time_point t1 = steady_clock::now();
+
+       vector<string> texts(20);
+       for (int i = 0; i < 20; ++i) {
+           texts[i]=("../textoRandom" + to_string(i) + ".txt");
+
+       }
+
+       uint t = 10;
+       uint k = 5;
+       uint b = 5, r = 2;
+       double thershold = pow((double)1/b,(double)1/r);
+
+       vector<vector<double>> matrix(20,vector<double>(20));
+
+       set<pair<int,int>> correctPairs;
+
+       for (int i = 0; i < 20; ++i) {
+           for (int j = i + 1; j < 20; ++j) {
+               if (i == j) matrix[i][j] = 1;
+               else {
+                   KShingleSet kshingleset1(k, texts[i]);
+                   KShingleSet kshingleset2(k, texts[j]);
+                   if (kshingleset1.jaccard(kshingleset2) >= thershold) correctPairs.insert(pair<int,int>(i,j));
+               }
+
+           }
+       }
+
+
+
+
+       MinHashSignatures minHash(t, k,  texts, HashWithPrime, true);
+
+
+       LSH lsh(minHash.getSignatures(),b,r,mod);
+
+       ofstream writeFile("./Resultados experimentos/resultadosPrimerExpetimentoLSH.txt");
+
+       cout << "ESTE SET ES EL DE PAREJAS REALES CON SIMILITUD >= " << thershold << endl;
+       for (pair<int,int> p : correctPairs) {
+            cout << p.first << ' ' << p.second << endl;
+       }
+
+       cout << "ESTE SET ES EL DE PAREJAS DE LSH" <<  endl;
+       for (pair<int,int> p : lsh.getSetPairs()) {
+            cout << p.first << ' ' << p.second << endl;
+       }
+
+
+
+       steady_clock::time_point t2 = steady_clock::now();
+       duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+   }
+}
+
+/*int main() {
+    primerExperimentoLSH();
+}*/
+
 
