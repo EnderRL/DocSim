@@ -92,18 +92,22 @@ void MinHashSignatures::randomPermutations(const KShingleMap &map,bool tiempo) {
 }
 
 void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint k, bool tiempo) {
+
     vector<pair<uint, uint>> hashFunctions(t);
+    if(not tiempo) medida += t*2*sizeof(uint);
     signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
     srand(time(NULL));
     for (uint i = 0; i < t; ++i) {
         hashFunctions[i] = pair<uint, uint>(rand(), rand());
-        cout << "H" << i << " es " << hashFunctions[i].first << "x + " << hashFunctions[i].second << " mod 2^32" << endl;
+        //cout << "H" << i << " es " << hashFunctions[i].first << "x + " << hashFunctions[i].second << " mod 2^32" << endl;
     }
     const ull mod = 4294967296;
     uint j = 0;
-    for (string text : texts) {
-        for (uint i = 0; i <= text.size()-k; ++i) {
-            ull hashed = KShingle::hashKShingle(text.substr(i, k));
+    for (string nombreArchivo : texts) {
+        Reader reader(nombreArchivo);
+
+        for (uint i = 0; i <= reader.getfileSize()-k; ++i) {
+            ull hashed = KShingle::hashKShingle(reader.getText(),i,i+k-1);
             //cout << "He sacado el kshingle " << text.substr(i,k) << " del texto " << j << " y su hasheado me ha dao " << hashed << endl;
             for (uint row = 0; row < t; ++row) {
                 pair<uint, uint> p = hashFunctions[row];
@@ -112,7 +116,6 @@ void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint
             }
         }
         ++j;
-
     }
 
     /*
@@ -135,7 +138,6 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     if (mode == Hash32) {
         permutations32(texts, t, k, tiempo);
         return;
-
     }
 
     //LEE TEXTOS Y LOS KSHINGLEA
@@ -172,7 +174,7 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     uint numRepetidos = 0;
     unordered_set<uint> repeated;
     vector<pair<uint, uint>> hashFunctions(t);
-    medida += t*2*sizeof(uint);
+    if(not tiempo) medida += t*2*sizeof(uint);
     for (uint i = 0; i < t; ++i) {
         hashFunctions[i] = pair<uint, uint>(rand(), rand());
     }
@@ -224,7 +226,7 @@ double MinHashSignatures::jaccard(uint a, uint b) {
 }
 
 uint MinHashSignatures::size(){
-    return medida;
+    return medida + finalSize();
 }
 
 uint MinHashSignatures::finalSize() {

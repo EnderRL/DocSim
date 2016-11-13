@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include <fstream>
 #include <list>
+#include "reader.h"
 using namespace std;
 
 enum PermutationMode {

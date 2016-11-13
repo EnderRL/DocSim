@@ -79,7 +79,7 @@ void testHashKShingles() {
     cout << "Resultado: " << KShingle::hashKShingle(text) << endl;
 }
 
-void testMinHash(const vector<string>& names, PermutationMode permutationMode,bool tiempo) {
+void testMinHash(const vector<string>& names, PermutationMode permutationMode,bool tiempo,ofstream& writer) {
 
     /*cout << "Introduce la k deseada." << endl;
     uint k;
@@ -90,9 +90,8 @@ void testMinHash(const vector<string>& names, PermutationMode permutationMode,bo
     */
 
     MinHashSignatures minHashSignatures(9, 250, names, permutationMode,tiempo);
-    if(not tiempo) cout << minHashSignatures.size() << " " << minHashSignatures.finalSize() << " ";
+    if(not tiempo) writer << minHashSignatures.size() << " " << minHashSignatures.finalSize() << " " << minHashSignatures.jaccard(0,1) << " ";
    // cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
-    minHashSignatures.jaccard(0, 1);
 }
 
 void testKShingleHashed(const string& name1, const string& name2) {
@@ -148,6 +147,8 @@ void testLSH() {
 }
 void experimentoMinHash() {
 
+    ofstream writer("../Experimento.txt");
+    writer << "TiempoMHExacto EEMHExacto EFMHExacto Jaccard MHExacto TiempoMHHash EEMHHash EFMHHash JaccardMHHash TiempoMHPrimos EEMHPrimos EFMHPrimos Jaccard MHPrimos TiempoMH32 EEMH32 EFMH32 JaccardMH32 TiempoGuay EFGuay JaccardGuay" << endl;
     vector<string> names = {"../textoPrueba1.txt", "../textoPrueba2.txt" };
     steady_clock::time_point t1;
     steady_clock::time_point t2;
@@ -155,55 +156,61 @@ void experimentoMinHash() {
     for(int i = 0; i < 1; ++i) {
         //Medir tiempo exacto
         t1 = steady_clock::now();
-        testMinHash(names,Random,true);
+        testMinHash(names,Random,true,writer);
         t2 = steady_clock::now();
         time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << time_span.count() << " ";
+        writer << time_span.count() << " ";
 
         //Medir espacio exacto
-        testMinHash(names,Random,false);
+        testMinHash(names,Random,false,writer);
 
         //Medir tiempo Hash
         t1 = steady_clock::now();
-        testMinHash(names,Hash,true);
+        testMinHash(names,Hash,true,writer);
         t2 = steady_clock::now();
         time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << time_span.count() << " ";
+        writer << time_span.count() << " ";
 
         //Medir espacio Hash
-        testMinHash(names, Hash, false);
+        testMinHash(names, Hash, false, writer);
 
         //Medir tiempo Hash Primos
         t1 = steady_clock::now();
-        testMinHash(names,HashWithPrime,true);
+        testMinHash(names,HashWithPrime,true, writer);
         t2 = steady_clock::now();
         time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << time_span.count() << " ";
+        writer << time_span.count() << " ";
 
         //Medir espacio Hash Primos
-        testMinHash(names,HashWithPrime,false);
+        testMinHash(names,HashWithPrime,false, writer);
 
+        //Medir tiempo Hash 2^32
+        t1 = steady_clock::now();
+        testMinHash(names,Hash32,true, writer);
+        t2 = steady_clock::now();
+        time_span = duration_cast<duration<double>>(t2 - t1);
+        writer << time_span.count() << " ";
 
+        //Medir espacio Hash 2^32
+        testMinHash(names,Hash32,false, writer);
 
         Reader file1(names[0]);
         Reader file2 (names[1]);
 
-
         t1 = steady_clock::now();
         KShingleSetHashed kShingleSet1(9,file1.getText(),file1.getfileSize());
         KShingleSetHashed kShingleSet2(9,file2.getText(),file2.getfileSize());
-        KShingleSetHashed::jaccard(kShingleSet1,kShingleSet2);
+
         t2 = steady_clock::now();
         time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << time_span.count() << " ";
-        cout << kShingleSet1.size()+kShingleSet2.size() << endl;
+        writer << time_span.count() << " ";
+        writer << kShingleSet1.size()+kShingleSet2.size() << " ";
+        writer << KShingleSetHashed::jaccard(kShingleSet1,kShingleSet2) << endl;
 
         //Cambiar par de textos
         names[0] =  "";
         names[1] =  "";
     }
-
-
 }
 int main() {
     //vector<string> names = {"../textoPrueba1.txt", "../textoPrueba2.txt" };
