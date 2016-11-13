@@ -160,6 +160,7 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     }
 
     if(not tiempo) {
+        cout << "Calculando espacio" << endl;
         for (pair<uint,unordered_set<uint>> it : mapa.mapa) {
             medida += it.second.size()*sizeof(uint);
         }
@@ -182,8 +183,14 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     }
 
     uint mod;
-    if (mode == HashWithPrime) mod = nextPrime(mapa.mapa.size());
-    else mod = mapa.mapa.size();
+    if (mode == HashWithPrime) {
+        cout << "calculando primo" << endl;
+        mod = nextPrime(mapa.mapa.size());
+    }
+    else {
+        cout <<"no calculando primo" << endl;
+        mod = mapa.mapa.size();
+    }
 
 
     uint indice = 0;
