@@ -15,3 +15,15 @@ uint KShingle::hashKShingle(const string& kshingle) {
     sum += kshingle[kshingle.size()-1];
     return sum%mod;
 }
+
+uint KShingle::hashKShingle(const char *kshingle, uint firstIndex, uint lastIndex) {
+    const uint base = 256;
+    const ull mod = MAX_SIZE_4B;
+
+    ull sum = 0;
+    for (uint i = firstIndex; i < lastIndex; ++i) {
+        sum = (((sum +  kshingle[i])%mod)*base)%mod;
+    }
+    sum += kshingle[lastIndex];
+    return sum%mod;
+}

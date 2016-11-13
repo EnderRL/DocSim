@@ -11,7 +11,9 @@ SOURCES += main.cpp \
     kshingleset.cpp \
     minhashsignatures.cpp \
     kshinglemap.cpp \
-    lsh.cpp
+    lsh.cpp \
+    kshinglesethashed.cpp \
+    reader.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
@@ -21,5 +23,7 @@ HEADERS += \
     minhashsignatures.h \
     kshinglemap.h \
     kshingleset.h \
-    lsh.h
+    lsh.h \
+    kshinglesethashed.h \
+    reader.h
 

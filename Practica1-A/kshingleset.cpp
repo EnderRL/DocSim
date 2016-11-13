@@ -22,9 +22,9 @@ double KShingleSet::jaccard(const KShingle &Bs) {
     const KShingleSet& B = (KShingleSet&)Bs;
     int unionSize = 0;
     int interSize = 0;
-    Iterator i = kshingles.begin();
+    IteratorS i = kshingles.begin();
     int ipos = 0;
-    Iterator j = B.kshingles.cbegin();
+    IteratorS j = B.kshingles.cbegin();
     int jpos = 0;
     while (i != kshingles.end() and j != B.kshingles.cend()) {
         if (*i == *j) {
@@ -59,7 +59,7 @@ void KShingleSet::print() {
     }
 }
 
-int KShingleSet::size() {
+uint KShingleSet::size() {
     return kshingles.size();
 }
 

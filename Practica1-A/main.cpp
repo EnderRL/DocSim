@@ -4,7 +4,8 @@
 #include "kshingleset.h"
 #include "lsh.h"
 #include "minhashsignatures.h"
-#include <list>
+#include "reader.h"
+#include "kshinglesethashed.h"
 
 void generadorTextos(const string& nombre) {
     srand(time(NULL));
@@ -83,7 +84,13 @@ void testMinHash(const vector<string>& names) {
 
     MinHashSignatures minHashSignatures(t, k, names, HashWithPrime);
     cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
+}
 
+void testKShingleHashed(const string& name1, const string& name2) {
+    Reader file1(name1);
+    Reader file2(name2);
+
+    KShingleSetHashed kshingles(9, file1.getText(), file1.getfileSize());
 }
 
 void testLSH() {
@@ -99,19 +106,44 @@ void testLSH() {
                                     {3,3,3},
                                     {4,4,4},
                                     {5,5,5}};
-    //TODO: El LSH no me funciona y no se por qué.
-    //LSH lsh(matrix, 3, 3, 10);
+
+    LSH lsh(matrix, 3, 3, 10);
 }
 
 void primerExperimentoLSHU() {
    for (uint mod = 5; mod < 500; mod +=5) {
        steady_clock::time_point t1 = steady_clock::now();
-       uint t =;
-       uint k =;
        vector<string> texts(20);
        for (int i = 0; i < 20; ++i) {
-           texts[i] = ;
+           Reader reader("textoRandom" + i);
+           texts[i] = reader.getText();
        }
+
+       uint t =;
+       uint k =;
+       double thershold =;
+
+       vector<vector<double>> matrix(20,vector<double>(20));
+
+       set<pair<int,int>> correctPairs;
+
+       for (int i = 0; i < 20; ++i) {
+           for (int j = i + 1; j < 20; ++j) {
+               if (i == j) matrix[i][j] = 1;
+               else {
+                   KShingleSet kshingleset1(k, texts[i]);
+                   KShingleSet kshingleset2(k, texts[j]);
+                   matrix[i][j] =  kshingleset1.jaccard(kshingleset2);
+               }
+
+           }
+       }
+
+       KShingleSet kshingleset1(k, text1);
+       KShingleSet kshingleset2(k, text2);
+
+
+
        MinHashSignatures(t, k,  texts, HashWithPrime);
 
        steady_clock::time_point t2 = steady_clock::now();
@@ -121,6 +153,6 @@ void primerExperimentoLSHU() {
 
 int main() {
     vector<string> names = {"../lorem0.txt", "../lorem1.txt" };
-    testMinHash(names);
+    testKShingleHashed(names[0], names[1]);
 }
 
