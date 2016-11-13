@@ -35,12 +35,12 @@ void generadorTextos(const string& path, const string &nombre, uint numTexts, ui
 
     char* text = input.getText();
     uint size = input.getfileSize();
-    char* copy = new char[input.getfileSize()];
+    char* copy = new char[size];
     uint numIterations;
 
     for (uint j = 0; j < numTexts; ++j) {
         numIterations = increment*j + 10;
-        memcpy(copy, text, input.getfileSize());
+        memcpy(copy, text, size);
         ofstream output(path + nombre + "Random" + to_string(j) + ".txt");
 
         for (uint i = 0; i < numIterations; ++i) {
@@ -67,7 +67,7 @@ void generadorTextos(const string& path, const string &nombre, uint numTexts, ui
                 }
             }
         }
-        output.write(copy, input.getfileSize());
+        output.write(copy, size);
         output.close();
     }
 }
@@ -152,9 +152,9 @@ void testMinHash(const vector<string>& names, PermutationMode permutationMode,bo
     if(tiempo) writer << time_span.count() << " ";
     else {
         writer << minHashSignatures.size() << " " << minHashSignatures.finalSize() << " ";
-        for(int i = 1;i<8;++i){
+        for(int i = 1;i<20;++i){
             writer << minHashSignatures.jaccard(0,i);
-            if(i < 7) writer << " ";
+            if(i < 19) writer << " ";
             else writer << endl;
         }
     }
@@ -221,21 +221,10 @@ void testLSH() {
 
     LSH lsh(matrix, 3, 3, 10);
 }
-void experimentoMinHash() {
+void experimentoMinHash(const vector<string>& names,string outputFile) {
 
-    steady_clock::time_point t1;
-    steady_clock::time_point t2;
-    duration<double> time_span;
-    ofstream writer("../Experimento.txt");
+    ofstream writer(outputFile);
     writer << "TiempoMHHash EEMHHash EFMHHash JaccardMHHash TiempoMHPrimos EEMHPrimos EFMHPrimos Jaccard MHPrimos TiempoMH32 EEMH32 EFMH32 JaccardMH32 TiempoGuay EFGuay JaccardGuay" << endl;
-    vector<string> names = {
-        "../DataSet Experimento 1/juegodetronos.txt",
-        "../DataSet Experimento 1/juegodetronosmodificado.txt",
-        "../DataSet Experimento 1/juegodetronosRandom5.txt",
-        "../DataSet Experimento 1/juegodetronosRandom19.txt",
-        "../DataSet Experimento 1/textoDummyRandom10.txt",
-        "../DataSet Experimento 1/textoDummyRandom19.txt",
-        "../DataSet Experimento 1/textoPrueba2.txt"};
 
         cout << "Tiempo Hash" << endl;
         testMinHash(names,Hash,true,writer);
@@ -251,7 +240,7 @@ void experimentoMinHash() {
         testMinHash(names,Hash32,false, writer);
 
         Reader file1(names[0]);
-        for(int i = 1; i < 7; ++i) {
+        for(int i = 1; i < names.size(); ++i) {
             Reader file2 (names[i]);
             KShingleSetHashed kShingleSet1(9,file1.getText(),file1.getfileSize());
             KShingleSetHashed kShingleSet2(9,file2.getText(),file2.getfileSize());
@@ -274,7 +263,11 @@ int main() {
         "../DataSet Experimento 1/textoDummyRandom19.txt",
         "../DataSet Experimento 1/textoPrueba2.txt"};
 
-    experimentoMinHash();
+    vector<string> names(20);
+    for(int i = 0; i < 20; ++i)names[i] = "../textoRandom" + to_string(i) + ".txt";
+    experimentoMinHash(names,"../ExperimentoMinHashTextosRandom.txt");
+    for(int i = 0; i < 20; ++i)names[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i) + ".txt";
+    experimentoMinHash(names,"../ExperimentoMinHashJuegoDeTronos.txt");
     //generadorTextos("../DataSet Experimento 1/", "textoDummy", 20, 100);
 
 }
