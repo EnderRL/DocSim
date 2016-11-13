@@ -4,6 +4,10 @@
 #include "minhashsignatures.h"
 #include "reader.h"
 #include "kshinglesethashed.h"
+#include <ctime>
+#include <ratio>
+#include <chrono>
+using namespace std::chrono;
 
 void generadorTextos(const string& nombre) {
     srand(time(NULL));
@@ -71,7 +75,7 @@ void testHashKShingles() {
     cout << "Resultado: " << KShingle::hashKShingle(text) << endl;
 }
 
-void testMinHash(const vector<string>& names) {
+void testMinHash(const vector<string>& names, PermutationMode permutationMode) {
 
     cout << "Introduce la k deseada." << endl;
     uint k;
@@ -80,7 +84,7 @@ void testMinHash(const vector<string>& names) {
     uint t;
     cin >> t;
 
-    MinHashSignatures minHashSignatures(t, k, names, HashWithPrime);
+    MinHashSignatures minHashSignatures(t, k, names, permutationMode);
     cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
 }
 
@@ -112,9 +116,43 @@ void testLSH() {
 
     LSH lsh(matrix, 3, 3, 10);
 }
+void experimentoMinHash() {
 
-int main() {
     vector<string> names = {"../textoPrueba1.txt", "../textoPrueba2.txt" };
-    testKShingleHashed(names[0], names[1]);
+    steady_clock::time_point t1;
+    steady_clock::time_point t2;
+    duration<double> time_span;
+    for(int i = 0; i < 20; ++i) {
+        //Medir tiempo exacto
+        t1 = steady_clock::now();
+        testMinHash(names,Random);
+        t2 = steady_clock::now();
+        time_span = duration_cast<duration<double>>(t2 - t1);
+        cout << time_span.count() << " ";
+
+        //Medir tiempo Hash
+        t1 = steady_clock::now();
+        testMinHash(names,Hash);
+        t2 = steady_clock::now();
+        time_span = duration_cast<duration<double>>(t2 - t1);
+        cout << time_span.count() << " ";
+
+        //Medir tiempo Hash Primos
+        t1 = steady_clock::now();
+        testMinHash(names,HashWithPrime);
+        t2 = steady_clock::now();
+        time_span = duration_cast<duration<double>>(t2 - t1);
+        cout << time_span.count() << endl;
+
+        //Cambiar par de textos
+        names[0] =  "";
+        names[1] =  "";
+    }
+
+}
+int main() {
+    //vector<string> names = {"../textoPrueba1.txt", "../textoPrueba2.txt" };
+    //testKShingleHashed(names[0], names[1]);
+    experimentoMinHash();
 }
 
