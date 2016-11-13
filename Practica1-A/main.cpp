@@ -87,7 +87,9 @@ void testMinHash(const vector<string>& names) {
 }
 
 void testKShingleHashed(const string& name1, const string& name2) {
-    ofstream output("../Resultados experimentos/Experimenos Jaccard Similarity");
+    ofstream output("../Resultados experimentos/Experimentos Jaccard Similarity/jaccardsimilarity.txt");
+
+    output << "Hashed time\tHashed space\tHashed res\tNo Hashed time\tNo Hashed space\tNo Hasehd res" << endl;
 
     Reader file1(name1);
     Reader file2(name2);
@@ -97,14 +99,26 @@ void testKShingleHashed(const string& name1, const string& name2) {
     KShingleSetHashed kshingles1(9, file1.getText(), file1.getfileSize());
     KShingleSetHashed kshingles2(9, file2.getText(), file2.getfileSize());
 
+    double jaccardHashed = KShingleSetHashed::jaccard(kshingles1, kshingles2);
+
     steady_clock::time_point t2 = steady_clock::now();
 
     duration<double> timeSpan = duration_cast<duration<double>>(t2 - t1);
 
-    cout << "Tiempo Kshingles hasheado: " << timeSpan.count()  << endl;
+    output << timeSpan.count() << "\t" << kshingles1.size()+kshingles2.size() << "\t" << jaccardHashed << endl;
+
+    t1 = steady_clock::now();
 
     KShingleSet kshinglesSet1(9, file1.getText(), file1.getfileSize());
     KShingleSet kshinglesSet2(9, file2.getText(), file2.getfileSize());
+
+    double jaccardNoHashed = KShingleSet::jaccard(kshinglesSet1, kshinglesSet2);
+
+    t2 = steady_clock::now();
+
+    timeSpan = duration_cast<duration<double>>(t2 - t1);
+
+    output << timeSpan.count() << "\t" << kshinglesSet1.size()+kshinglesSet2.size() << "\t" << jaccardNoHashed << endl;
 }
 
 void testLSH() {

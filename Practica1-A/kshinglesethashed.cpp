@@ -79,5 +79,5 @@ void KShingleSetHashed::print() {
 }
 
 uint KShingleSetHashed::size() {
-    return kshingles.size();
+    return kshingles.size()*sizeof(uint);
 }
