@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include "kshingleset.h"
 #include "lsh.h"
 #include "minhashsignatures.h"
@@ -75,29 +76,41 @@ void testHashKShingles() {
     cout << "Resultado: " << KShingle::hashKShingle(text) << endl;
 }
 
-void testMinHash(const vector<string>& names, PermutationMode permutationMode) {
+void testMinHash(const vector<string>& names, PermutationMode permutationMode,bool tiempo) {
 
-    cout << "Introduce la k deseada." << endl;
+    /*cout << "Introduce la k deseada." << endl;
     uint k;
     cin >> k;
     cout << "Introduce t" << endl;
     uint t;
     cin >> t;
+    */
 
-    MinHashSignatures minHashSignatures(t, k, names, permutationMode);
-    cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
+    MinHashSignatures minHashSignatures(9, 250, names, permutationMode,tiempo);
+    if(not tiempo) cout << minHashSignatures.size() << " " << minHashSignatures.finalSize() << " ";
+   // cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
+    minHashSignatures.jaccard(0, 1);
 }
 
 void testKShingleHashed(const string& name1, const string& name2) {
+    ofstream output("../Resultados experimentos/Experimenos Jaccard Similarity");
+
     Reader file1(name1);
-    KShingleSetHashed kshingles1(9, file1.getText(), file1.getfileSize());
-    KShingleSet kshinglesSet1(9, file1.getText(), file1.getfileSize());
-
     Reader file2(name2);
-    KShingleSetHashed kshingles2(9, file2.getText(), file2.getfileSize());
-    KShingleSet kshinglesSet2(9, file2.getText(), file2.getfileSize());
 
-    cout << "Jaccard: " << kshingles1.jaccard(kshingles2) << " " << kshinglesSet1.jaccard(kshinglesSet2) << endl;
+    steady_clock::time_point t1 = steady_clock::now();
+
+    KShingleSetHashed kshingles1(9, file1.getText(), file1.getfileSize());
+    KShingleSetHashed kshingles2(9, file2.getText(), file2.getfileSize());
+
+    steady_clock::time_point t2 = steady_clock::now();
+
+    duration<double> timeSpan = duration_cast<duration<double>>(t2 - t1);
+
+    cout << "Tiempo Kshingles hasheado: " << timeSpan.count()  << endl;
+
+    KShingleSet kshinglesSet1(9, file1.getText(), file1.getfileSize());
+    KShingleSet kshinglesSet2(9, file2.getText(), file2.getfileSize());
 }
 
 void testLSH() {
@@ -122,27 +135,49 @@ void experimentoMinHash() {
     steady_clock::time_point t1;
     steady_clock::time_point t2;
     duration<double> time_span;
-    for(int i = 0; i < 20; ++i) {
+    for(int i = 0; i < 1; ++i) {
         //Medir tiempo exacto
         t1 = steady_clock::now();
-        testMinHash(names,Random);
+        testMinHash(names,Random,true);
         t2 = steady_clock::now();
         time_span = duration_cast<duration<double>>(t2 - t1);
         cout << time_span.count() << " ";
 
+        //Medir espacio exacto
+        testMinHash(names,Random,false);
+
         //Medir tiempo Hash
         t1 = steady_clock::now();
-        testMinHash(names,Hash);
+        testMinHash(names,Hash,true);
+        t2 = steady_clock::now();
+        time_span = duration_cast<duration<double>>(t2 - t1);
+        cout << time_span.count() << " ";
+
+        //Medir espacio Hash
+        testMinHash(names, Hash, false);
+
+        //Medir tiempo Hash Primos
+        t1 = steady_clock::now();
+        testMinHash(names,HashWithPrime,true);
         t2 = steady_clock::now();
         time_span = duration_cast<duration<double>>(t2 - t1);
         cout << time_span.count() << " ";
 
         //Medir tiempo Hash Primos
+        testMinHash(names,HashWithPrime,false);
+
+        Reader file1(names[0]);
+        Reader file2 (names[1]);
+
+
         t1 = steady_clock::now();
-        testMinHash(names,HashWithPrime);
+        KShingleSetHashed kShingleSet1(9,file1.getText(),file1.getfileSize());
+        KShingleSetHashed kShingleSet2(9,file2.getText(),file2.getfileSize());
+        KShingleSetHashed::jaccard(kShingleSet1,kShingleSet2);
         t2 = steady_clock::now();
         time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << time_span.count() << endl;
+        cout << time_span.count() << " ";
+        cout << kShingleSet1.size()+kShingleSet2.size() << endl;
 
         //Cambiar par de textos
         names[0] =  "";
@@ -155,4 +190,9 @@ int main() {
     //testKShingleHashed(names[0], names[1]);
     experimentoMinHash();
 }
+
+/*int main() {
+    vector<string> names = {"../lorem0.txt", "../lorem2.txt" };
+    testKShingleHashed(names[0], names[1]);
+}*/
 

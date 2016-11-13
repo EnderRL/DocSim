@@ -9,6 +9,7 @@
 #include "kshinglemap.h"
 #include <unordered_set>
 #include <fstream>
+#include <list>
 using namespace std;
 
 enum PermutationMode {
@@ -21,13 +22,19 @@ typedef unsigned int uint;
 typedef vector<vector<uint>> matrix;
 
 class MinHashSignatures {
-    vector<pair<uint, uint>> hashFunctions;
-    matrix signatures;
 
-    void RandomPermutations(const KShingleMap& map);
+    matrix signatures;
+    uint medida;
+    uint medidaFinal;
+    bool tiempo;
+
+
+    void RandomPermutations(const KShingleMap& map, bool tiempo);
 public:
-    MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode);
+    MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode, bool tiempo);
     double jaccard(uint a, uint b);
+    uint size();
+    uint finalSize();
 };
 
 #endif // MINHASHSIGNATURES_H
