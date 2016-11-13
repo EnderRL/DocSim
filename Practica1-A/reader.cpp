@@ -21,6 +21,10 @@ uint Reader::getfileSize() {
     return fileSize;
 }
 
+void Reader::deleteText() {
+    delete fileText;
+}
+
 Reader::~Reader() {
     delete fileText;
 }

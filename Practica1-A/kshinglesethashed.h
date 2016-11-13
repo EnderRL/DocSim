@@ -12,6 +12,7 @@ class KShingleSetHashed : public KShingle {
 public:
     KShingleSetHashed(int k, const char* source, uint size);
     uint size();
+    static double jaccard(const KShingleSetHashed& A, const KShingleSetHashed& B);
     double jaccard(const KShingle& Bs);
     void print();
 };

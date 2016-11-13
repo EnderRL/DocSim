@@ -46,6 +46,11 @@ int nextPrime(uint a) {
     return a;
 }
 
+matrix MinHashSignatures::getSignatures() const
+{
+    return signatures;
+}
+
 void MinHashSignatures::RandomPermutations(const KShingleMap &map) {
 
     uint t = signatures.size();
@@ -86,6 +91,7 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
 
     for (uint i = 0; i < texts.size(); ++i) {
+
         ifstream input(texts[i]);
 
         input.seekg(0, ios::end);
@@ -93,6 +99,7 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
         input.seekg(0, ios::beg);
 
         char* text = new char[size];
+
         input.read(text, size);
         mapa.add(i, text, size);
 
@@ -100,7 +107,7 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
         input.close();
     }
 
-    cout << "kshingles total " << mapa.mapa.size() << endl;
+   // cout << "kshingles total " << mapa.mapa.size() << endl;
 
     srand(time(NULL));
 
@@ -143,7 +150,7 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
         ++indice;
     }
 
-    cout << "Repetidos funcion hash 1: " << numRepetidos << endl;
+    //cout << "Repetidos funcion hash 1: " << numRepetidos << endl;
 
     /*for (uint i = 0; i < t; ++i) {
         for (uint j = 0; j < texts.size(); ++j) {

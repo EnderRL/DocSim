@@ -5,7 +5,7 @@ KShingle::KShingle(int k) {
 }
 
 uint KShingle::hashKShingle(const string& kshingle) {
-    const uint base = 256;
+    const uint base = 128;
     const ull mod = MAX_SIZE_4B;
 
     ull sum = 0;
@@ -17,7 +17,7 @@ uint KShingle::hashKShingle(const string& kshingle) {
 }
 
 uint KShingle::hashKShingle(const char *kshingle, uint firstIndex, uint lastIndex) {
-    const uint base = 256;
+    const uint base = 128;
     const ull mod = MAX_SIZE_4B;
 
     ull sum = 0;
@@ -25,5 +25,6 @@ uint KShingle::hashKShingle(const char *kshingle, uint firstIndex, uint lastInde
         sum = (((sum +  kshingle[i])%mod)*base)%mod;
     }
     sum += kshingle[lastIndex];
+
     return sum%mod;
 }

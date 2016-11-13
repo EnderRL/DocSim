@@ -18,6 +18,36 @@ KShingleSet::KShingleSet(int k, const char* source, uint size) : KShingle(k) {
     }
 }
 
+double KShingleSet::jaccard(const KShingleSet &A, const KShingleSet &B) {
+    uint unionSize = 0;
+    uint interSize = 0;
+    IteratorS i = A.kshingles.cbegin();
+    uint ipos = 0;
+    IteratorS j = B.kshingles.cbegin();
+    uint jpos = 0;
+    while (i != A.kshingles.cend() and j != B.kshingles.cend()) {
+        if (*i == *j) {
+            ++interSize;
+            ++i;
+            ++ipos;
+            ++j;
+            ++jpos;
+        }
+        else if (*i < *j) {
+            ++i;
+            ++ipos;
+        }
+        else {
+            ++j;
+            ++jpos;
+        }
+        ++unionSize;
+    }
+    if (i == A.kshingles.cend()) unionSize += B.kshingles.size() - jpos;
+    else unionSize += A.kshingles.size() - ipos;
+    return (double)interSize/unionSize;
+}
+
 double KShingleSet::jaccard(const KShingle &Bs) {
     const KShingleSet& B = (KShingleSet&)Bs;
     int unionSize = 0;
@@ -60,6 +90,6 @@ void KShingleSet::print() {
 }
 
 uint KShingleSet::size() {
-    return kshingles.size();
+    return kshingles.size()*(k*sizeof(char));
 }
 

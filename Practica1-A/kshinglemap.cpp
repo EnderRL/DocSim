@@ -10,11 +10,7 @@ KShingleMap::KShingleMap(int k) {
 void KShingleMap::add(uint document, const char* source, uint size) {
     char subString[k];
     for (uint i = 0; i <= size-k; ++i) {
-        for (int j = 0; j < k; ++j) {
-            subString[j] =  source[i+j];
-        }
-        string aux(subString, k);
-        uint hashed = KShingle::hashKShingle(aux);
+        uint hashed = KShingle::hashKShingle(source, i, i+k-1);
         mapa[hashed].push_back(document);
     }
 }
