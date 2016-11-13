@@ -171,6 +171,8 @@ void testKShingleHashed(const vector<string>& name1, const vector<string>& name2
 
         cout << "comparando " << name1[i] << " " << name2[i] << endl;
 
+        output << name1[i] << "\t" << name2[i] << endl;
+
         for (uint k = 4; k <= 10; ++k) {
 
             steady_clock::time_point t1 = steady_clock::now();
@@ -227,12 +229,11 @@ void experimentoMinHash() {
     ofstream writer("../Experimento.txt");
     writer << "TiempoMHHash EEMHHash EFMHHash JaccardMHHash TiempoMHPrimos EEMHPrimos EFMHPrimos Jaccard MHPrimos TiempoMH32 EEMH32 EFMH32 JaccardMH32 TiempoGuay EFGuay JaccardGuay" << endl;
     vector<string> names = {
-        "../DataSet Experimento 1/textoDummy.txt",
-        "../DataSet Experimento 1/textoPrueba1.txt",
-        "../DataSet Experimento 1/textoDummyRandom0.txt",
-        "../DataSet Experimento 1/textoDummyRandom5.txt",
+        "../DataSet Experimento 1/juegodetronos.txt",
+        "../DataSet Experimento 1/juegodetronosmodificado.txt",
+        "../DataSet Experimento 1/juegodetronosRandom5.txt",
+        "../DataSet Experimento 1/juegodetronosRandom19.txt",
         "../DataSet Experimento 1/textoDummyRandom10.txt",
-        "../DataSet Experimento 1/textoDummyRandom15.txt",
         "../DataSet Experimento 1/textoDummyRandom19.txt",
         "../DataSet Experimento 1/textoPrueba2.txt"};
 
@@ -250,7 +251,7 @@ void experimentoMinHash() {
         testMinHash(names,Hash32,false, writer);
 
         Reader file1(names[0]);
-        for(int i = 1; i < 8; ++i) {
+        for(int i = 1; i < 7; ++i) {
             Reader file2 (names[i]);
             KShingleSetHashed kShingleSet1(9,file1.getText(),file1.getfileSize());
             KShingleSetHashed kShingleSet2(9,file2.getText(),file2.getfileSize());
@@ -259,21 +260,23 @@ void experimentoMinHash() {
 }
 int main() {
     vector<string> names1 = {
-        "../DataSet Experimento 1/textoDummy.txt",
-        "../DataSet Experimento 1/textoDummy.txt",
-        "../DataSet Experimento 1/textoDummy.txt",
+        "../DataSet Experimento 1/juegodetronos.txt",
+        "../DataSet Experimento 1/juegodetronos.txt",
+        "../DataSet Experimento 1/juegodetronos.txt",
         "../DataSet Experimento 1/textoDummy.txt",
         "../DataSet Experimento 1/textoDummy.txt",
         "../DataSet Experimento 1/textoPrueba1.txt"};
     vector<string> names2 = {
-        "../DataSet Experimento 1/textoDummyRandom0.txt",
-        "../DataSet Experimento 1/textoDummyRandom5.txt",
+        "../DataSet Experimento 1/juegodetronosmodificado.txt",
+        "../DataSet Experimento 1/juegodetronosRandom5.txt",
+        "../DataSet Experimento 1/juegodetronosRandom19.txt",
         "../DataSet Experimento 1/textoDummyRandom10.txt",
-        "../DataSet Experimento 1/textoDummyRandom15.txt",
         "../DataSet Experimento 1/textoDummyRandom19.txt",
         "../DataSet Experimento 1/textoPrueba2.txt"};
+
     experimentoMinHash();
     //generadorTextos("../DataSet Experimento 1/", "textoDummy", 20, 100);
+
 }
 
 void primerExperimentoLSH() {
