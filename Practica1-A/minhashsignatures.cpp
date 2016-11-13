@@ -70,8 +70,10 @@ void MinHashSignatures::randomPermutations(const KShingleMap &map,bool tiempo) {
     uint indice = 0;
 
     for (pair<uint,unordered_set<uint>> kShingleActual : map.mapa) {
-
+        cout << (double) indice/map.mapa.size() << endl;
         for (uint row = 0; row < t; ++row) {
+            //cout << t << endl;
+            //cout << "dentro segundo for en la row: " << row << endl;
             list<uint>& permutationList = permutationLists[row];
 
             uint randomIndex = rand()%permutationList.size();
@@ -129,7 +131,6 @@ void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint
 
 MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode,bool tiempo) {
 
-    this->tiempo = tiempo;
     medida = 0;
     medidaFinal = 0;
     KShingleMap mapa(k);
@@ -162,19 +163,20 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
         for (pair<uint,unordered_set<uint>> it : mapa.mapa) {
             medida += it.second.size()*sizeof(uint);
         }
+        medida += t*2*sizeof(uint);
     }
 
     srand(time(NULL));
 
     if (mode == Random) {
+        cout << "Prerandom" << endl;
         randomPermutations(mapa,tiempo);
         return;
     }
 
-    uint numRepetidos = 0;
-    unordered_set<uint> repeated;
+    //uint numRepetidos = 0;
+   //unordered_set<uint> repeated;
     vector<pair<uint, uint>> hashFunctions(t);
-    if(not tiempo) medida += t*2*sizeof(uint);
     for (uint i = 0; i < t; ++i) {
         hashFunctions[i] = pair<uint, uint>(rand(), rand());
     }
@@ -192,12 +194,12 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
 
             uint permutedRow = ((p.first*indice)%mod + p.second)%mod;
 
-            if (row == 0) {
+           /* if (row == 0) {
                 unordered_set<uint>::iterator it = repeated.find(permutedRow);
 
                 if (it != repeated.end()) ++numRepetidos;
                 else repeated.insert(permutedRow);
-            }
+            }*/
 
             for (uint documento :  kShingleActual.second) {
                 signatures[row][documento] = min(permutedRow, signatures[row][documento]);

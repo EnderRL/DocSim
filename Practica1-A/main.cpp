@@ -140,16 +140,24 @@ void testHashKShingles() {
 
 void testMinHash(const vector<string>& names, PermutationMode permutationMode,bool tiempo,ofstream& writer) {
 
-    /*cout << "Introduce la k deseada." << endl;
-    uint k;
-    cin >> k;
-    cout << "Introduce t" << endl;
-    uint t;
-    cin >> t;
-    */
 
-    MinHashSignatures minHashSignatures(9, 250, names, permutationMode,tiempo);
-    if(not tiempo) writer << minHashSignatures.size() << " " << minHashSignatures.finalSize() << " " << minHashSignatures.jaccard(0,1) << " ";
+    steady_clock::time_point t1;
+    steady_clock::time_point t2;
+    duration<double> time_span;
+
+    t1 = steady_clock::now();
+    MinHashSignatures minHashSignatures(250, 9, names, permutationMode,tiempo);
+    t2 = steady_clock::now();
+    time_span = duration_cast<duration<double>>(t2 - t1);
+    if(tiempo) writer << time_span.count() << " ";
+    else {
+        writer << minHashSignatures.size() << " " << minHashSignatures.finalSize() << " ";
+        for(int i = 1;i<8;++i){
+            writer << minHashSignatures.jaccard(0,i);
+            if(i < 7) writer << " ";
+            else writer << endl;
+        }
+    }
    // cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
 }
 
@@ -213,70 +221,41 @@ void testLSH() {
 }
 void experimentoMinHash() {
 
-    ofstream writer("../Experimento.txt");
-    writer << "TiempoMHExacto EEMHExacto EFMHExacto Jaccard MHExacto TiempoMHHash EEMHHash EFMHHash JaccardMHHash TiempoMHPrimos EEMHPrimos EFMHPrimos Jaccard MHPrimos TiempoMH32 EEMH32 EFMH32 JaccardMH32 TiempoGuay EFGuay JaccardGuay" << endl;
-    vector<string> names = {"../textoPrueba1.txt", "../textoPrueba2.txt" };
     steady_clock::time_point t1;
     steady_clock::time_point t2;
     duration<double> time_span;
-    for(int i = 0; i < 1; ++i) {
-        //Medir tiempo exacto
-        t1 = steady_clock::now();
-        testMinHash(names,Random,true,writer);
-        t2 = steady_clock::now();
-        time_span = duration_cast<duration<double>>(t2 - t1);
-        writer << time_span.count() << " ";
+    ofstream writer("../Experimento.txt");
+    writer << "TiempoMHHash EEMHHash EFMHHash JaccardMHHash TiempoMHPrimos EEMHPrimos EFMHPrimos Jaccard MHPrimos TiempoMH32 EEMH32 EFMH32 JaccardMH32 TiempoGuay EFGuay JaccardGuay" << endl;
+    vector<string> names = {
+        "../DataSet Experimento 1/textoDummy.txt",
+        "../DataSet Experimento 1/textoPrueba1.txt",
+        "../DataSet Experimento 1/textoDummyRandom0.txt",
+        "../DataSet Experimento 1/textoDummyRandom5.txt",
+        "../DataSet Experimento 1/textoDummyRandom10.txt",
+        "../DataSet Experimento 1/textoDummyRandom15.txt",
+        "../DataSet Experimento 1/textoDummyRandom19.txt",
+        "../DataSet Experimento 1/textoPrueba2.txt"};
 
-        //Medir espacio exacto
-        testMinHash(names,Random,false,writer);
-
-        //Medir tiempo Hash
-        t1 = steady_clock::now();
+        cout << "Tiempo Hash" << endl;
         testMinHash(names,Hash,true,writer);
-        t2 = steady_clock::now();
-        time_span = duration_cast<duration<double>>(t2 - t1);
-        writer << time_span.count() << " ";
-
-        //Medir espacio Hash
+        cout << "Espacio Hash" << endl;
         testMinHash(names, Hash, false, writer);
-
-        //Medir tiempo Hash Primos
-        t1 = steady_clock::now();
+        cout << "Tiempo Primos" << endl;
         testMinHash(names,HashWithPrime,true, writer);
-        t2 = steady_clock::now();
-        time_span = duration_cast<duration<double>>(t2 - t1);
-        writer << time_span.count() << " ";
-
-        //Medir espacio Hash Primos
+        cout << "Espacio Primos" << endl;
         testMinHash(names,HashWithPrime,false, writer);
-
-        //Medir tiempo Hash 2^32
-        t1 = steady_clock::now();
+        cout << "Tiempo 32" << endl;
         testMinHash(names,Hash32,true, writer);
-        t2 = steady_clock::now();
-        time_span = duration_cast<duration<double>>(t2 - t1);
-        writer << time_span.count() << " ";
-
-        //Medir espacio Hash 2^32
+        cout << "Espacio 32" << endl;
         testMinHash(names,Hash32,false, writer);
 
         Reader file1(names[0]);
-        Reader file2 (names[1]);
-
-        t1 = steady_clock::now();
-        KShingleSetHashed kShingleSet1(9,file1.getText(),file1.getfileSize());
-        KShingleSetHashed kShingleSet2(9,file2.getText(),file2.getfileSize());
-
-        t2 = steady_clock::now();
-        time_span = duration_cast<duration<double>>(t2 - t1);
-        writer << time_span.count() << " ";
-        writer << kShingleSet1.size()+kShingleSet2.size() << " ";
-        writer << KShingleSetHashed::jaccard(kShingleSet1,kShingleSet2) << endl;
-
-        //Cambiar par de textos
-        names[0] =  "";
-        names[1] =  "";
-    }
+        for(int i = 1; i < 8; ++i) {
+            Reader file2 (names[i]);
+            KShingleSetHashed kShingleSet1(9,file1.getText(),file1.getfileSize());
+            KShingleSetHashed kShingleSet2(9,file2.getText(),file2.getfileSize());
+            writer << KShingleSetHashed::jaccard(kShingleSet1,kShingleSet2) << endl;
+        }
 }
 int main() {
     vector<string> names1 = {
@@ -293,7 +272,7 @@ int main() {
         "../DataSet Experimento 1/textoDummyRandom15.txt",
         "../DataSet Experimento 1/textoDummyRandom19.txt",
         "../DataSet Experimento 1/textoPrueba2.txt"};
-    testKShingleHashed(names1, names2);
+    experimentoMinHash();
     //generadorTextos("../DataSet Experimento 1/", "textoDummy", 20, 100);
 }
 

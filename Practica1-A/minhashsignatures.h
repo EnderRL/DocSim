@@ -28,7 +28,6 @@ class MinHashSignatures {
     matrix signatures;
     uint medida;
     uint medidaFinal;
-    bool tiempo;
 
 
     void randomPermutations(const KShingleMap& map, bool tiempo);
