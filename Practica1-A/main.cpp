@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <ctime>
 #include "kshingleset.h"
 #include "lsh.h"
 #include "minhashsignatures.h"
@@ -100,6 +101,22 @@ void testLSH() {
                                     {5,5,5}};
     //TODO: El LSH no me funciona y no se por qué.
     //LSH lsh(matrix, 3, 3, 10);
+}
+
+void primerExperimentoLSHU() {
+   for (uint mod = 5; mod < 500; mod +=5) {
+       steady_clock::time_point t1 = steady_clock::now();
+       uint t =;
+       uint k =;
+       vector<string> texts(20);
+       for (int i = 0; i < 20; ++i) {
+           texts[i] = ;
+       }
+       MinHashSignatures(t, k,  texts, HashWithPrime);
+
+       steady_clock::time_point t2 = steady_clock::now();
+       duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+   }
 }
 
 int main() {
