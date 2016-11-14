@@ -154,6 +154,29 @@ void testMinHash(const vector<string>& names, PermutationMode permutationMode,bo
    // cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
 }
 
+void testMinHashVariableT(const vector<string>& names, PermutationMode permutationMode,bool tiempo,ofstream& writer,uint t) {
+
+
+    steady_clock::time_point t1;
+    steady_clock::time_point t2;
+    duration<double> time_span;
+
+    t1 = steady_clock::now();
+    MinHashSignatures minHashSignatures(t, 9, names, permutationMode,tiempo);
+    t2 = steady_clock::now();
+    time_span = duration_cast<duration<double>>(t2 - t1);
+    if(tiempo) writer << t << " " << time_span.count() << " ";
+    else {
+        writer << minHashSignatures.size() << " " << minHashSignatures.finalSize() << " ";
+        for(int i = 1;i<names.size();++i){
+            writer << minHashSignatures.jaccard(0,i);
+            if(i < names.size()-1) writer << " ";
+            else writer << endl;
+        }
+    }
+   // cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
+}
+
 void primerExperimento(const vector<string>& name1, const vector<string>& name2) {
     ofstream output("../Resultados experimentos/Experimentos Jaccard Similarity/jaccardsimilarity.txt");
 
@@ -208,7 +231,7 @@ void primerExperimento(const vector<string>& names) {
 
         cout << "comparando " << names[0] << " " << names[i] << endl;
 
-        output << names[i] << "\t" << names[i] << endl;
+        output << names[0] << "\t" << names[i] << endl;
 
         for (uint k = 4; k <= 10; ++k) {
 
@@ -283,6 +306,19 @@ void experimentoMinHash(const vector<string>& names,string outputFile) {
             KShingleSetHashed kShingleSet2(9,file2.getText(),file2.getfileSize());
             writer << KShingleSetHashed::jaccard(kShingleSet1,kShingleSet2) << endl;
         }
+}
+
+
+void experimentoMinHash32(const vector<string>& names, string outputFile){
+
+    ofstream writer(outputFile);
+
+    for(uint t = 100; t < 900; t += 50) {
+        cout << "Tiempo Hash32" << endl;
+        testMinHashVariableT(names,Hash32,true,writer,t);
+        cout << "Espacio Hash32" << endl;
+        testMinHashVariableT(names,Hash32,false,writer,t);
+    }
 }
 
 void setSimilarity (uint& unionSize, uint& interSize, const set<pair<uint,uint>>& correctPairs, const set<pair<uint,uint>>& lshPairs) {
@@ -394,12 +430,14 @@ void primerExperimentoLSH() {
 }
 
 int main() {
+
     vector<string> names(21);
-    names[0] = "../DataSet Experimento 1/juegodetronos.txt";
-    for (int i = 1; i < 21; ++i) {
-        names[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
+    names[0] = "../DataSet Experimento 1/textoDummy.txt";
+    for (int i = 1; i < names.size(); ++i) {
+        names[i] = "../DataSet Experimento 1/textoDummyRandom" + to_string(i-1) + ".txt";
     }
-    experimentoMinHash(names,"../Resultados experimentos/Experimentos MinHash/resultadosJuegoDeTronos.txt");
+    experimentoMinHash32(names,"../Resultados experimentos/Experimentos MinHash/resultadosDummyVariableT.txt");
+
 }
 
 

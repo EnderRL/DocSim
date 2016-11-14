@@ -8,7 +8,10 @@ KShingleMap::KShingleMap(int k) {
 }
 
 void KShingleMap::add(uint document, const char* source, uint size) {
+
     for (uint i = 0; i <= size-k; ++i) {
+        //cout << "size: " << size << endl;
+        //cout << i << endl;
         uint hashed = KShingle::hashKShingle(source, i, i+k-1);
         mapa[hashed].insert(document);
     }
