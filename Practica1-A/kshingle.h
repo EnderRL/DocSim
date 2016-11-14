@@ -2,6 +2,7 @@
 #define KSHINGLE_H
 
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 typedef unsigned int uint;

@@ -198,8 +198,8 @@ void primerExperimento(const vector<string>& name1, const vector<string>& name2)
     }
 }
 
-void primerExperimento(const vector<string>& names) {
-    ofstream output("../Resultados experimentos/Experimentos Jaccard Similarity/jaccardsimilarity.txt");
+void primerExperimento(const vector<string>& names, const string& testName) {
+    ofstream output("../Resultados experimentos/Experimentos Jaccard Similarity/" + testName + ".txt");
 
     output << "Hashed time\tHashed space\tHashed res\tNo Hashed time\tNo Hashed space\tNo Hasehd res" << endl;
     Reader file1(names[0]);
@@ -395,11 +395,11 @@ void primerExperimentoLSH() {
 
 int main() {
     vector<string> texts(21);
-    texts[0] = "../DataSet Experimento 1/juegodetronos.txt";
+    texts[0] = "../DataSet Experimento 1/texto50palabras.txt";
     for (int i = 1; i < 21; ++i) {
-        texts[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
+        texts[i] = "../DataSet Experimento 1/texto50palabrasRandom" + to_string(i-1) + ".txt";
     }
-    primerExperimento(texts);
+    primerExperimento(texts, "texto50palabras");
 }
 
 
