@@ -208,7 +208,7 @@ void primerExperimento(const vector<string>& names) {
 
         cout << "comparando " << names[0] << " " << names[i] << endl;
 
-        output << names[i] << "\t" << names[i] << endl;
+        output << names[0] << "\t" << names[i] << endl;
 
         for (uint k = 4; k <= 10; ++k) {
 
@@ -394,7 +394,12 @@ void primerExperimentoLSH() {
 }
 
 int main() {
-    generadorTextos("texto50palabras");
+    vector<string> texts(21);
+    texts[0] = "../DataSet Experimento 1/juegodetronos.txt";
+    for (int i = 1; i < 21; ++i) {
+        texts[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
+    }
+    primerExperimento(texts);
 }
 
 
