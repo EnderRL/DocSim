@@ -145,9 +145,9 @@ void testMinHash(const vector<string>& names, PermutationMode permutationMode,bo
     if(tiempo) writer << time_span.count() << " ";
     else {
         writer << minHashSignatures.size() << " " << minHashSignatures.finalSize() << " ";
-        for(int i = 1;i<20;++i){
+        for(int i = 1;i<names.size();++i){
             writer << minHashSignatures.jaccard(0,i);
-            if(i < 19) writer << " ";
+            if(i < names.size()-1) writer << " ";
             else writer << endl;
         }
     }
@@ -394,7 +394,12 @@ void primerExperimentoLSH() {
 }
 
 int main() {
-    generadorTextos("texto50palabras");
+    vector<string> names(21);
+    names[0] = "../DataSet Experimento 1/juegodetronos.txt";
+    for (int i = 1; i < 21; ++i) {
+        names[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
+    }
+    experimentoMinHash(names,"../Resultados experimentos/Experimentos MinHash/resultadosJuegoDeTronos.txt");
 }
 
 

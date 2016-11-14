@@ -130,7 +130,6 @@ void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint
 }
 
 MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode,bool tiempo) {
-
     medida = 0;
     medidaFinal = 0;
     KShingleMap mapa(k);
@@ -144,19 +143,8 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     //LEE TEXTOS Y LOS KSHINGLEA
 
     for (uint i = 0; i < texts.size(); ++i) {
-        ifstream input(texts[i]);
-
-        input.seekg(0, ios::end);
-        uint size = input.tellg();
-        input.seekg(0, ios::beg);
-
-        char* text = new char[size];
-
-        input.read(text, size);
-        mapa.add(i, text, size);
-
-        delete text;
-        input.close();
+        Reader reader(texts[i]);
+        mapa.add(i,reader.getText(),reader.getfileSize());
     }
 
     if(not tiempo) {
