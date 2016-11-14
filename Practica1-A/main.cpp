@@ -77,35 +77,34 @@ void generadorTextos(const string& nombre) {
     srand(time(NULL));
     ifstream input("../" + nombre + ".txt");
 
-    input.seekg(0, ios::end);
-    uint size = input.tellg();
+    string word;
+    vector<string> words;
 
-    input.seekg(0, ios::beg);
+    while (input >> word) {
+        words.push_back(word);
+    }
 
-    char* text = new char[size];
-    input.read(text, size);
-
-    char* permutacion = new char[size];
+    vector<string> copy(words.size());
 
     for(uint i = 0; i < 20 ;++i) {
         list<uint> indices;
-        for(uint j = 0; j < size; ++j) indices.push_back(j);
-        for(uint j = 0; j < size; ++j) {
+        for(uint j = 0; j < words.size(); ++j) indices.push_back(j);
+        for(uint j = 0; j < words.size(); ++j) {
             uint indiceRandom = rand()%indices.size();
             list<uint>::iterator iterador = indices.begin();
             for(uint k = 0; k <indiceRandom; ++k) {
                 ++iterador;
             }
-            permutacion[*iterador] = text[j];
+            copy[*iterador] = words[j];
             indices.erase(iterador);
         }
 
         ofstream output("../" + nombre + "Random" + to_string(i) + ".txt");
-        output.write(permutacion, size);
+        for (string wordInText : copy) {
+            output << wordInText << " ";
+        }
         output.close();
     }
-
-
 }
 
 void leeString(string& text) {
@@ -395,14 +394,7 @@ void primerExperimentoLSH() {
 }
 
 int main() {
-    uint t;
-    double treshold;
-    cout << "Introduce t y treshold" << endl;
-    cin >> t >> treshold;
-    uint b, r;
-    if (!escogeParametrosLSH(treshold,t,b,r)) cout << "No existe b y r con threshold " << treshold << endl;
-    cout << "La b es " << b << " y la r es " << r << endl;
-
+    generadorTextos("texto50palabras");
 }
 
 
