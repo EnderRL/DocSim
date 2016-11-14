@@ -15,7 +15,6 @@ public:
     static const ull MAX_SIZE_4B = 4294967296;
 
     KShingle(int k);
-    static uint hashKShingle(const string& kshingle);
     static uint hashKShingle(const char* kshingle, uint firstIndex, uint lastIndex);
     virtual double jaccard(const KShingle& B) = 0;
     virtual uint size() = 0;

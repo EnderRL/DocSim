@@ -131,13 +131,6 @@ void testKShingles() {
     cout << "El coeficiente de jaccard es " << kshingleset1.jaccard(kshingleset2) << endl;
 }
 
-void testHashKShingles() {
-    cout << "Introduce la string a convertir a numero" << endl;
-    string text;
-    leeString(text);
-    cout << "Resultado: " << KShingle::hashKShingle(text) << endl;
-}
-
 void testMinHash(const vector<string>& names, PermutationMode permutationMode,bool tiempo,ofstream& writer) {
 
 
@@ -351,7 +344,6 @@ void primerExperimentoLSH() {
        texts[0] = "../DataSet Experimento 1/juegodetronos.txt";
        for (int i = 1; i < 21; ++i) {
            texts[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
-
        }
 
        uint b,r;
@@ -404,6 +396,7 @@ int main() {
     uint b, r;
     if (!escogeParametrosLSH(treshold,t,b,r)) cout << "No existe b y r con threshold " << treshold << endl;
     cout << "La b es " << b << " y la r es " << r << endl;
+
 }
 
 
