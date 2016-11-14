@@ -1,6 +1,6 @@
 #include "minhashsignatures.h"
 
-bool isPrime(uint number) {
+static bool isPrime(uint number) {
 
     if (number == 2 || number == 3)
         return true;
@@ -38,11 +38,8 @@ void garbell(vector<bool>& v){
 }
 
 
-int nextPrime(uint a) {
-    //vector<bool> v (a+a, true);
-    //garbell(v);
+uint MinHashSignatures::nextPrime(uint a) {
     while (!isPrime(a)) ++a;
-    //while(!v[a]) ++a;
     return a;
 }
 
