@@ -316,63 +316,62 @@ void setSimilarity (uint& unionSize, uint& interSize, const set<pair<uint,uint>>
 }
 
 bool escogeParametrosLSH(const double thershold, const uint t, uint& b, uint& r) {
-    for (double error = 0.01; error <= 1; error += 0.01) {
-         srand(time(NULL));
-         list<uint> possibleBValues;
-         for (uint i = 2; i <= t; ++i) possibleBValues.push_back(i);
+    double minError = 1;
+    for (uint i = 2; i < t; ++i) {
+        if (t%i == 0) {
+            uint bAux = i;
+            uint rAux = t/i;
+            double relativeError = (abs(pow(1./bAux,1./rAux) - thershold))/thershold;
+            if (minError > relativeError) {
+                minError = relativeError;
+                b = bAux;
+                r = rAux;
+            }
+        }
+     }
+    if (minError >= 1) return false;
+    return true;
 
-         while (possibleBValues.size() != 0) {
-             list<uint>::iterator it;
-             uint indiceRandom = rand()%possibleBValues.size();
-             it = possibleBValues.begin();
-             for (uint i = 0; i < indiceRandom; ++i) ++it;
-             b = *it;
-             if (t%b == 0) {
-                 r = t/b;
-                 double relativeError = (abs(pow(1./b,1./r) - thershold))/thershold;
-                 cout << "Relative error: " << relativeError << " cota error: " << error << " b: " << b << " r: " << r << endl;
-                 if ((abs(pow(1./b,1./r) - thershold))/thershold <= error) {
-                    cout << "Lo he conseguido con error relativo de " << error << endl;
-                     return true;
-                 }
-             }
-             possibleBValues.erase(it);
-         }
-
-    }
-    return false;
 }
 
+
+
+
 void primerExperimentoLSH() {
-   for (uint mod = 5; mod < 500; mod +=5) {
 
-       vector<string> texts(21);
-       texts[0] = "../DataSet Experimento 1/juegodetronos.txt";
-       for (int i = 1; i < 21; ++i) {
-           texts[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
-       }
+   uint k = 5;
+   uint b,r;
+   double treshold = 0.7;
+   uint t = 50;
 
-       uint b,r;
-       double thershold;
-       uint t = 10;
+   escogeParametrosLSH(treshold,t,b,r);
 
-       if (!escogeParametrosLSH(thershold,t,b,r)) cout << "No existe b y r con threshold " << thershold << endl;
+    vector<string> texts(21);
+    texts[0] = "../DataSet Experimento 1/juegodetronos.txt";
+    for (int i = 1; i < 21; ++i) {
+        texts[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
+    }
+
+    set<pair<uint,uint>> correctPairs;
+
+    for (uint i = 0; i < 20; ++i) {
+        Reader reader1(texts[i]);
+        for (uint j = i + 1; j < 20; ++j) {
+            Reader reader2(texts[j]);
+            KShingleSetHashed kshingleset1(k, reader1.getText(), reader1.getfileSize());
+            KShingleSetHashed kshingleset2(k, reader2.getText(), reader2.getfileSize());
+            if (kshingleset1.jaccard(kshingleset2) >= treshold) correctPairs.insert(pair<uint,uint>(i,j));
+        }
+    }
+
+    MinHashSignatures minHash(t, k,  texts, Hash32, true);
+
+    ofstream writeFile("../Resultados experimentos/resultadosPrimerExpetimentoLSH.txt");
+    writeFile << "TRESHOLD\tFALSOS_POSITIVOS\tFALSOS_NEGATVOS\tPORCENTAJE_ACERTADAS\tTIEMPO"<<endl;
 
 
-       uint k = 5;
-
-
-       set<pair<uint,uint>> correctPairs;
-
-       for (uint i = 0; i < 20; ++i) {
-           for (uint j = i + 1; j < 20; ++j) {
-               KShingleSet kshingleset1(k, texts[i]);
-               KShingleSet kshingleset2(k, texts[j]);
-               if (kshingleset1.jaccard(kshingleset2) >= thershold) correctPairs.insert(pair<uint,uint>(i,j));
-           }
-       }
-
-       MinHashSignatures minHash(t, k,  texts, HashWithPrime, true);
+    uint mod = 13;
+    for (uint count = 0; count < 100; ++count) {
 
        steady_clock::time_point t1 = steady_clock::now();
 
@@ -380,28 +379,89 @@ void primerExperimentoLSH() {
 
        steady_clock::time_point t2 = steady_clock::now();
 
-       ofstream writeFile("./Resultados experimentos/resultadosPrimerExpetimentoLSH.txt");
 
        uint unionSize, intersectionSize;
 
        setSimilarity(unionSize, intersectionSize, correctPairs, lsh.getSetPairs());
 
-       cout << "En total hay " << correctPairs.size() << " parejas de textos similares " <<
-               lsh.getSetPairs().size() << " parejas de LSH similares." << endl;
-       cout << "Coinciden " << intersectionSize << " parejas que son el " << (double)intersectionSize/(double)unionSize << "%" << endl;
 
        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+
+       writeFile << mod << "\t" << lsh.getSetPairs().size() - intersectionSize << "\t" <<  correctPairs.size() - intersectionSize << "\t" << (double)intersectionSize / correctPairs.size() << "\t" << time_span.count() << endl;
+        mod = MinHashSignatures::nextPrime(mod+1);
+
+   }
+}
+
+void segundoExperimentoLSH() {
+
+   vector<string> texts(21);
+   texts[0] = "../DataSet Experimento 1/juegodetronos.txt";
+   for (int i = 1; i < 21; ++i) {
+       texts[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
+   }
+
+
+   ofstream writeFile("../Resultados experimentos/resultadosSegundoExpetimentoLSH.txt");
+   writeFile << "TRESHOLD\tB\tR\tFALSOS_POSITIVOS\tFALSOS_NEGATVOS\tPORCENTAJE_ACERTADAS\tTIEMPO"<<endl;
+
+   srand(time(NULL));
+   uint mod = MinHashSignatures::nextPrime(rand()%200+100);
+   cout << mod << endl;
+
+   uint k = 5;
+   vector<vector<double>> matrix(21,vector<double>(21));
+   for (uint i = 0; i < 20; ++i) {
+       Reader reader1(texts[i]);
+       for (uint j = i + 1; j < 20; ++j) {
+           Reader reader2(texts[j]);
+           KShingleSetHashed kshingleset1(k, reader1.getText(), reader1.getfileSize());
+           KShingleSetHashed kshingleset2(k, reader2.getText(), reader2.getfileSize());
+           matrix[i][j] = kshingleset1.jaccard(kshingleset2);
+       }
+   }
+
+
+   for (double treshold = 0.01; treshold <= 1; treshold += 0.01) {
+
+       uint b,r;
+       uint t = 50;
+
+      if (escogeParametrosLSH(treshold,t,b,r)) {
+
+           set<pair<uint,uint>> correctPairs;
+           for (uint i = 0; i < 20; ++i) {
+               for (uint j = i ; j < 20; ++j) {
+                   if (matrix[i][j] >= treshold) correctPairs.insert(pair<uint,uint>(i,j));
+               }
+           }
+
+           MinHashSignatures minHash(t, k,  texts, Hash32, true);
+
+           steady_clock::time_point t1 = steady_clock::now();
+           LSH lsh(minHash.getSignatures(),b,r,mod);
+
+           steady_clock::time_point t2 = steady_clock::now();
+
+
+           uint unionSize, intersectionSize;
+
+           setSimilarity(unionSize, intersectionSize, correctPairs, lsh.getSetPairs());
+
+
+           duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+            cout <<  "TRESHOLD " << treshold << endl;
+           cout << "CORRECTAS REALES: " << correctPairs.size() << " CORRECTAS PREDECIDAS: " << intersectionSize << " CORRECTAS FALSAS: " << lsh.getSetPairs().size() - intersectionSize << " CORRECTAS NO ENCONTRADAS: " << correctPairs.size() - intersectionSize << endl;
+           cout << endl;
+           writeFile << treshold << "\t" << b << "\t" << r << "\t" << lsh.getSetPairs().size() - intersectionSize << "\t" <<  correctPairs.size() - intersectionSize << "\t" << (double)intersectionSize / correctPairs.size() << "\t" << time_span.count() << endl;
+      }
+
    }
 }
 
 int main() {
-    uint t;
-    double treshold;
-    cout << "Introduce t y treshold" << endl;
-    cin >> t >> treshold;
-    uint b, r;
-    if (!escogeParametrosLSH(treshold,t,b,r)) cout << "No existe b y r con threshold " << treshold << endl;
-    cout << "La b es " << b << " y la r es " << r << endl;
+    primerExperimentoLSH();
+    //segundoExperimentoLSH();
 
 }
 
