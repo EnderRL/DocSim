@@ -77,35 +77,34 @@ void generadorTextos(const string& nombre) {
     srand(time(NULL));
     ifstream input("../" + nombre + ".txt");
 
-    input.seekg(0, ios::end);
-    uint size = input.tellg();
+    string word;
+    vector<string> words;
 
-    input.seekg(0, ios::beg);
+    while (input >> word) {
+        words.push_back(word);
+    }
 
-    char* text = new char[size];
-    input.read(text, size);
-
-    char* permutacion = new char[size];
+    vector<string> copy(words.size());
 
     for(uint i = 0; i < 20 ;++i) {
         list<uint> indices;
-        for(uint j = 0; j < size; ++j) indices.push_back(j);
-        for(uint j = 0; j < size; ++j) {
+        for(uint j = 0; j < words.size(); ++j) indices.push_back(j);
+        for(uint j = 0; j < words.size(); ++j) {
             uint indiceRandom = rand()%indices.size();
             list<uint>::iterator iterador = indices.begin();
             for(uint k = 0; k <indiceRandom; ++k) {
                 ++iterador;
             }
-            permutacion[*iterador] = text[j];
+            copy[*iterador] = words[j];
             indices.erase(iterador);
         }
 
         ofstream output("../" + nombre + "Random" + to_string(i) + ".txt");
-        output.write(permutacion, size);
+        for (string wordInText : copy) {
+            output << wordInText << " ";
+        }
         output.close();
     }
-
-
 }
 
 void leeString(string& text) {
@@ -199,8 +198,8 @@ void primerExperimento(const vector<string>& name1, const vector<string>& name2)
     }
 }
 
-void primerExperimento(const vector<string>& names) {
-    ofstream output("../Resultados experimentos/Experimentos Jaccard Similarity/jaccardsimilarity.txt");
+void primerExperimento(const vector<string>& names, const string& testName) {
+    ofstream output("../Resultados experimentos/Experimentos Jaccard Similarity/" + testName + ".txt");
 
     output << "Hashed time\tHashed space\tHashed res\tNo Hashed time\tNo Hashed space\tNo Hasehd res" << endl;
     Reader file1(names[0]);
@@ -209,7 +208,7 @@ void primerExperimento(const vector<string>& names) {
 
         cout << "comparando " << names[0] << " " << names[i] << endl;
 
-        output << names[i] << "\t" << names[i] << endl;
+        output << names[0] << "\t" << names[i] << endl;
 
         for (uint k = 4; k <= 10; ++k) {
 
