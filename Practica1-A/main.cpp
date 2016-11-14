@@ -11,6 +11,7 @@
 #include <ctime>
 #include <ratio>
 #include <chrono>
+#include <cstring>
 using namespace std::chrono;
 
 ull holdrand = 1;
@@ -316,19 +317,24 @@ void setSimilarity (uint& unionSize, uint& interSize, const set<pair<uint,uint>>
 
 bool escogeParametrosLSH(const double thershold, const uint t, uint& b, uint& r) {
     for (double error = 0.01; error <= 1; error += 0.01) {
-         srand(NULL);
+         srand(time(NULL));
          list<uint> possibleBValues;
          for (uint i = 2; i <= t; ++i) possibleBValues.push_back(i);
 
          while (possibleBValues.size() != 0) {
              list<uint>::iterator it;
-             int indiceRandom = rand%possibleBValues.size();
+             uint indiceRandom = rand()%possibleBValues.size();
              it = possibleBValues.begin();
-             for (int i = 0; i < indiceRandom; ++i) ++it;
+             for (uint i = 0; i < indiceRandom; ++i) ++it;
              b = *it;
              if (t%b == 0) {
                  r = t/b;
-                 if ((abs(pow(1/b,1/r) - thershold))/thershold <= error) return true;
+                 double relativeError = (abs(pow(1./b,1./r) - thershold))/thershold;
+                 cout << "Relative error: " << relativeError << " cota error: " << error << " b: " << b << " r: " << r << endl;
+                 if ((abs(pow(1./b,1./r) - thershold))/thershold <= error) {
+                    cout << "Lo he conseguido con error relativo de " << error << endl;
+                     return true;
+                 }
              }
              possibleBValues.erase(it);
          }
