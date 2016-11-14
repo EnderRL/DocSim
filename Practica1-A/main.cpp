@@ -321,6 +321,29 @@ void setSimilarity (uint& unionSize, uint& interSize, const set<pair<uint,uint>>
     else unionSize += correctPairs.size() - ipos;
 }
 
+bool escogeParametrosLSH(const double thershold, const uint t, uint& b, uint& r) {
+    for (double error = 0.01; error <= 1; error += 0.01) {
+         srand(NULL);
+         list<uint> possibleBValues;
+         for (uint i = 2; i <= t; ++i) possibleBValues.push_back(i);
+
+         while (possibleBValues.size() != 0) {
+             list<uint>::iterator it;
+             int indiceRandom = rand%possibleBValues.size();
+             it = possibleBValues.begin();
+             for (int i = 0; i < indiceRandom; ++i) ++it;
+             b = *it;
+             if (t%b == 0) {
+                 r = t/b;
+                 if ((abs(pow(1/b,1/r) - thershold))/thershold <= error) return true;
+             }
+             possibleBValues.erase(it);
+         }
+
+    }
+    return false;
+}
+
 void primerExperimentoLSH() {
    for (uint mod = 5; mod < 500; mod +=5) {
 
@@ -331,10 +354,14 @@ void primerExperimentoLSH() {
 
        }
 
+       uint b,r;
+       double thershold;
        uint t = 10;
+
+       if (!escogeParametrosLSH(thershold,t,b,r)) cout << "No existe b y r con threshold " << thershold << endl;
+
+
        uint k = 5;
-       uint b = 5, r = 2;
-       double thershold = pow((double)1/b,(double)1/r);
 
 
        set<pair<uint,uint>> correctPairs;
@@ -370,7 +397,13 @@ void primerExperimentoLSH() {
 }
 
 int main() {
-    primerExperimentoLSH();
+    uint t;
+    double treshold;
+    cout << "Introduce t y treshold" << endl;
+    cin >> t >> treshold;
+    uint b, r;
+    if (!escogeParametrosLSH(treshold,t,b,r)) cout << "No existe b y r con threshold " << treshold << endl;
+    cout << "La b es " << b << " y la r es " << r << endl;
 }
 
 
