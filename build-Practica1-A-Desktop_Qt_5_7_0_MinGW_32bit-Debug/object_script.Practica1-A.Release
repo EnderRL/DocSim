@@ -1,0 +1,12 @@
+INPUT(
+./release\main.o
+./release\kshingle.o
+./release\kshingleset.o
+./release\minhashsignatures.o
+./release\lsh.o
+./release\kshinglesethashed.o
+./release\reader.o
+./release\kshinglesparsematrix.o
+./release\utils.o
+./release\mainexperimentosjaccard.o
+);
