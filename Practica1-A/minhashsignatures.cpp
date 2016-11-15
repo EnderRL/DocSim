@@ -54,9 +54,9 @@ void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint
     if(not tiempo) medida += t*2*sizeof(uint);
     signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
     for (uint i = 0; i < t; ++i) {
-        hashFunctions[i] = pair<uint, uint>(rand(), rand());
+        hashFunctions[i] = pair<uint, uint>(userRand(), userRand());
     }
-    const ull mod = 4294967296;
+    const ull mod = MAX_SIZE_4B;
     uint j = 0;
     for (string nombreArchivo : texts) {
         Reader reader(nombreArchivo);
@@ -75,6 +75,7 @@ void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint
 
 MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode,bool tiempo, uint seed) {
     srand(seed);
+    userSrand(seed);
     medida = 0;
     medidaFinal = 0;
     KShingleSparseMatrix mapa(k);
@@ -107,7 +108,7 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
     }
     vector<pair<uint, uint>> hashFunctions(t);
     for (uint i = 0; i < t; ++i) {
-        hashFunctions[i] = pair<uint, uint>(rand(), rand());
+        hashFunctions[i] = pair<uint, uint>(userRand(), userRand());
     }
 
     uint mod;
