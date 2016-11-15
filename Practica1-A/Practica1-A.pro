@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     kshinglesethashed.cpp \
     reader.cpp \
     kshinglesparsematrix.cpp \
-    utils.cpp
+    utils.cpp \
+    mainexperimentosjaccard.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
