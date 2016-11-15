@@ -5,6 +5,7 @@
 #include <time.h>
 #include <vector>
 #include <list>
+#include <cstring>
 #include "reader.h"
 
 typedef unsigned int uint;

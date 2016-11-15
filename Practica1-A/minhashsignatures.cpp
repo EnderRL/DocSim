@@ -53,10 +53,8 @@ void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint
     vector<pair<uint, uint>> hashFunctions(t);
     if(not tiempo) medida += t*2*sizeof(uint);
     signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
-    srand(time(NULL));
     for (uint i = 0; i < t; ++i) {
         hashFunctions[i] = pair<uint, uint>(rand(), rand());
-        //cout << "H" << i << " es " << hashFunctions[i].first << "x + " << hashFunctions[i].second << " mod 2^32" << endl;
     }
     const ull mod = 4294967296;
     uint j = 0;
@@ -65,7 +63,6 @@ void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint
 
         for (uint i = 0; i <= reader.getfileSize()-k; ++i) {
             ull hashed = KShingle::hashKShingle(reader.getText(),i,i+k-1);
-            //cout << "He sacado el kshingle " << text.substr(i,k) << " del texto " << j << " y su hasheado me ha dao " << hashed << endl;
             for (uint row = 0; row < t; ++row) {
                 pair<uint, uint> p = hashFunctions[row];
                 uint permutedRow = ((p.first*hashed)%mod + p.second)%mod;
@@ -74,17 +71,10 @@ void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint
         }
         ++j;
     }
-
-    /*
-    for (uint i = 0; i < t; ++i) {
-        for (uint j = 0; j < texts.size(); ++j) {
-            cout << signatures[i][j] << " ";
-        }
-        cout << endl;
-    }*/
 }
 
-MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode,bool tiempo) {
+MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode,bool tiempo, uint seed) {
+    srand(seed);
     medida = 0;
     medidaFinal = 0;
     KShingleSparseMatrix mapa(k);
@@ -109,15 +99,12 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
         medida += t*2*sizeof(uint);
     }
 
-    srand(time(NULL));
+
 
     if (mode == Random) {
         randomPermutations(mapa,tiempo);
         return;
     }
-
-    //uint numRepetidos = 0;
-   //unordered_set<uint> repeated;
     vector<pair<uint, uint>> hashFunctions(t);
     for (uint i = 0; i < t; ++i) {
         hashFunctions[i] = pair<uint, uint>(rand(), rand());
@@ -135,13 +122,6 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
 
             uint permutedRow = ((p.first*indice)%mod + p.second)%mod;
 
-           /* if (row == 0) {
-                unordered_set<uint>::iterator it = repeated.find(permutedRow);
-
-                if (it != repeated.end()) ++numRepetidos;
-                else repeated.insert(permutedRow);
-            }*/
-
             for (uint documento :  kShingleActual.second) {
                 signatures[row][documento] = min(permutedRow, signatures[row][documento]);
             }
@@ -149,14 +129,6 @@ MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts
         ++indice;
     }
 
-
-    //cout << "Repetidos funcion hash 1: " << numRepetidos << endl;
-    /*for (uint i = 0; i < t; ++i) {
-        for (uint j = 0; j < texts.size(); ++j) {
-            cout << signatures[i][j] << " ";
-        }
-        cout << endl;
-    }*/
 }
 
 double MinHashSignatures::jaccard(uint a, uint b) {
