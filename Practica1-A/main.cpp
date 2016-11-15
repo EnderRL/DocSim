@@ -360,11 +360,11 @@ void segundoExperimentoLSH() {
 
 int main() {
     vector<string> texts(21);
-    texts[0] = "../DataSet Experimento 1/textoDummy.txt";
+    texts[0] = "../DataSet Experimento 1/texto50palabras.txt";
     for (int i = 1; i < 21; ++i) {
-        texts[i] = "../DataSet Experimento 1/textoDummyRandom" + to_string(i-1) + ".txt";
+        texts[i] = "../DataSet Experimento 1/texto50palabrasRandom" + to_string(i-1) + ".txt";
     }
-    experimentoMinHash(texts,"../Resultados experimentos/Experimentos MinHash/resultadosTextoDummy.txt");
+    experimentoMinHash32(texts,"../Resultados experimentos/Experimentos MinHash/resultadosEstoyhastaloshuevos.txt");
 }
 
 
