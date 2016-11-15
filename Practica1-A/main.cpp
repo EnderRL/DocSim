@@ -235,13 +235,13 @@ bool escogeParametrosLSH(const double thershold, const uint t, uint& b, uint& r)
 }
 
 
-void primerExperimentoLSH() {
+void segundoExperimentoLSH() {
 
 
    uint k = 9;
    uint b,r;
    double treshold = 0.7;
-   uint t = 50;
+   uint t = 250;
 
    escogeParametrosLSH(treshold,t,b,r);
 
@@ -265,8 +265,8 @@ void primerExperimentoLSH() {
 
     MinHashSignatures minHash(t, k,  texts, Hash32, true,time(NULL));
 
-    ofstream writeFile("../Resultados experimentos/resultadosPrimerExpetimentoLSH.txt");
-    writeFile << "MOD\tFALSOS_POSITIVOS\tFALSOS_NEGATVOS\tSIMILITUD_SETS\tTIEMPO"<<endl;
+    ofstream writeFile("../Resultados experimentos/resultadosSegundoExpetimentoLSH.txt");
+    writeFile << "MOD\tFALSOS_POSITIVOS\tFALSOS_NEGATVOS\tSIMILITUD_SETS\tTIEMPO\tESPACIO"<<endl;
 
 
     uint mod = 13;
@@ -274,57 +274,57 @@ void primerExperimentoLSH() {
 
        steady_clock::time_point t1 = steady_clock::now();
 
-       LSH lsh(minHash.getSignatures(),b,r,mod);
+       LSH lsh(minHash.getSignatures(),b,r,mod,true);
 
        steady_clock::time_point t2 = steady_clock::now();
+
+       lsh = LSH(minHash.getSignatures(),b,r,mod,false);
 
 
        uint unionSize, intersectionSize;
 
        setSimilarity(unionSize, intersectionSize, correctPairs, *lsh.getSetPairs());
 
-
        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
 
-       writeFile << mod << "\t" << lsh.getSetPairs()->size() - intersectionSize << "\t" <<  correctPairs.size() - intersectionSize << "\t" << (double)intersectionSize / unionSize << "\t" << time_span.count() << endl;
+       writeFile << mod << "\t" << lsh.getSetPairs()->size() - intersectionSize << "\t" <<  correctPairs.size() - intersectionSize << "\t" << (double)intersectionSize / (double)unionSize << "\t" << time_span.count() <<  "\t" << lsh.size() <<   endl;
         mod = nextPrime(mod+1);
 
    }
 }
 
-void segundoExperimentoLSH() {
+void primerExperimentoLSH() {
 
    vector<string> texts(21);
-   texts[0] = "../DataSet Experimento 1/juegodetronos.txt";
+   texts[0] = "../DataSet Experimento 1/textoDummy.txt";
    for (int i = 1; i < 21; ++i) {
-       texts[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
+       texts[i] = "../DataSet Experimento 1/textoDummyRandom" + to_string(i-1) + ".txt";
    }
 
 
-   ofstream writeFile("../Resultados experimentos/resultadosSegundoExpetimentoLSH.txt");
-   writeFile << "TRESHOLD\tB\tR\tFALSOS_POSITIVOS\tFALSOS_NEGATVOS\tSIMILTUD_SETS\tTIEMPO"<<endl;
+   ofstream writeFile("../Resultados experimentos/resultadosPrimerExpetimentoLSH.txt");
+   writeFile << "TRESHOLD\tB\tR\tFALSOS_POSITIVOS\tFALSOS_NEGATVOS\tSIMILTUD_SETS\tTIEMPO\tESPACIO"<<endl;
 
    srand(time(NULL));
    uint mod =nextPrime(rand()%200+100);
-   cout << mod << endl;
 
    uint k = 9;
    vector<vector<double>> matrix(21,vector<double>(21));
    for (uint i = 0; i < 20; ++i) {
        Reader reader1(texts[i]);
+       KShingleSetHashed kshingleset1(k, reader1.getText(), reader1.getfileSize());
        for (uint j = i + 1; j < 20; ++j) {
            Reader reader2(texts[j]);
-           KShingleSetHashed kshingleset1(k, reader1.getText(), reader1.getfileSize());
            KShingleSetHashed kshingleset2(k, reader2.getText(), reader2.getfileSize());
            matrix[i][j] = KShingleSetHashed::jaccard(kshingleset1,kshingleset2);
        }
    }
 
 
-   for (double treshold = 0.01; treshold <= 1; treshold += 0.01) {
+   for (double treshold = 0.5; treshold <= 1; treshold += 0.01) {
 
        uint b,r;
-       uint t = 50;
+       uint t = 250;
 
       if (escogeParametrosLSH(treshold,t,b,r)) {
 
@@ -337,34 +337,31 @@ void segundoExperimentoLSH() {
 
            MinHashSignatures minHash(t, k,  texts, Hash32, true,time(NULL));
 
+
            steady_clock::time_point t1 = steady_clock::now();
-           LSH lsh(minHash.getSignatures(),b,r,mod);
+
+           LSH lsh(minHash.getSignatures(),b,r,mod,true);
 
            steady_clock::time_point t2 = steady_clock::now();
+
+
+           lsh = LSH(minHash.getSignatures(),b,r,mod,false);
 
 
            uint unionSize, intersectionSize;
 
            setSimilarity(unionSize, intersectionSize, correctPairs, *lsh.getSetPairs());
 
-
            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-            cout <<  "TRESHOLD " << treshold << endl;
-           cout << "CORRECTAS REALES: " << correctPairs.size() << " CORRECTAS PREDECIDAS: " << intersectionSize << " CORRECTAS FALSAS: " << lsh.getSetPairs()->size() - intersectionSize << " CORRECTAS NO ENCONTRADAS: " << correctPairs.size() - intersectionSize << endl;
-           cout << endl;
-           writeFile << treshold << "\t" << b << "\t" << r << "\t" << lsh.getSetPairs()->size() - intersectionSize << "\t" <<  correctPairs.size() - intersectionSize << "\t" << (double)intersectionSize /unionSize << "\t" << time_span.count() << endl;
+
+           writeFile << treshold << "\t" << b << "\t" << r << "\t" << lsh.getSetPairs()->size() - intersectionSize << "\t" <<  correctPairs.size() - intersectionSize << "\t" << (double)intersectionSize /(double)unionSize << "\t" << time_span.count() << "\t" << lsh.size() << endl;
       }
 
    }
 }
 
 int main() {
-    vector<string> texts(21);
-    texts[0] = "../DataSet Experimento 1/texto50palabras.txt";
-    for (int i = 1; i < 21; ++i) {
-        texts[i] = "../DataSet Experimento 1/texto50palabrasRandom" + to_string(i-1) + ".txt";
-    }
-    experimentoMinHash32(texts,"../Resultados experimentos/Experimentos MinHash/resultadosEstoyhastaloshuevos.txt");
+    segundoExperimentoLSH();
 }
 
 

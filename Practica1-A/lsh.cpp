@@ -1,6 +1,6 @@
 #include "lsh.h"
 
-LSH::LSH(const vector<vector<uint>>& matrix, uint b, uint r, uint mod) {
+LSH::LSH(const vector<vector<uint>>& matrix, uint b, uint r, uint mod, bool tiempo) {
     this->b = b;
     this->r = r;
     this ->mod = mod;
@@ -14,6 +14,14 @@ LSH::LSH(const vector<vector<uint>>& matrix, uint b, uint r, uint mod) {
         //LUEGO VAMOS MIRANDO LOS DIGITOS DE CADA COLUMNA K
             insertHashTable(j, k);
 
+        }
+    }
+    if (!tiempo) {
+        executionSize = 0;
+        for (int i = 0; i < tablaHash.size(); ++i) {
+            for (int j = 0; j < tablaHash[i].size(); ++j) {
+                executionSize += sizeof(uint)*tablaHash[i][j].size();
+            }
         }
     }
     tablaHash.clear();
@@ -55,5 +63,5 @@ set<pair<uint, uint> >* LSH::getSetPairs() {
 }
 
 uint LSH::size() {
-   return sizeof(pair<uint,uint>)*setPairs.size();
+   return sizeof(pair<uint,uint>)*setPairs.size() + executionSize;
 }
