@@ -10,10 +10,11 @@ SOURCES += main.cpp \
     kshingle.cpp \
     kshingleset.cpp \
     minhashsignatures.cpp \
-    kshinglemap.cpp \
     lsh.cpp \
     kshinglesethashed.cpp \
-    reader.cpp
+    reader.cpp \
+    kshinglesparsematrix.cpp \
+    utils.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
@@ -21,9 +22,10 @@ qtcAddDeployment()
 HEADERS += \
     kshingle.h \
     minhashsignatures.h \
-    kshinglemap.h \
     kshingleset.h \
     lsh.h \
     kshinglesethashed.h \
-    reader.h
+    reader.h \
+    utils.h \
+    kshinglesparsematrix.h
 

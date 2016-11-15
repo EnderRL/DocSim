@@ -1,6 +1,4 @@
 #include <iostream>
-#include <fstream>
-#include <ctime>
 #include <chrono>
 #include <cmath>
 #include "kshingleset.h"
@@ -8,130 +6,11 @@
 #include "minhashsignatures.h"
 #include "reader.h"
 #include "kshinglesethashed.h"
-#include <ctime>
-#include <ratio>
-#include <chrono>
-#include <cstring>
-using namespace std::chrono;
-
-ull holdrand = 1;
-
-void userSrand(uint seed) {
-    holdrand = (uint)seed;
-}
-
-uint userRand() {
-    const uint m = 67108864;
-    const uint a = 26353589;
-    const uint c = 14181771;
-    holdrand = (a*holdrand + c) % m;
-    return holdrand;
-}
+using namespace chrono;
 
 
-void generadorTextos(const string& path, const string &nombre, uint numTexts, uint increment) {
-    srand(time(NULL));
-    userSrand(time(NULL));
-    Reader input(path + nombre + ".txt");
 
-    char* text = input.getText();
-    uint size = input.getfileSize();
-    char* copy = new char[size];
-    uint numIterations;
-
-    for (uint j = 0; j < numTexts; ++j) {
-        numIterations = increment*j + 10;
-        memcpy(copy, text, size);
-        ofstream output(path + nombre + "Random" + to_string(j) + ".txt");
-
-        for (uint i = 0; i < numIterations; ++i) {
-            uint randomSize = rand()%6 + 1;
-
-            if (rand()%10 <= 8) {
-                uint indexRandom1 = userRand()%size;
-                uint indexRandom2 = userRand()%size;
-                if (indexRandom1 > size-randomSize) indexRandom1 = size-randomSize;
-                if (indexRandom2 > size-randomSize) indexRandom2 = size-randomSize;
-
-                for (uint k = 0; k < randomSize; ++k) {
-                    char aux = copy[indexRandom1+k];
-                    copy[indexRandom1+k] = copy[indexRandom2+k];
-                    copy[indexRandom2+k] = aux;
-                }
-            }
-            else {
-                uint indexRandom = userRand()%size;
-                if (indexRandom > size-randomSize) indexRandom = size-randomSize;
-
-                for (uint k = indexRandom; k < indexRandom+randomSize; ++k) {
-                    copy[k] = rand()%128;
-                }
-            }
-        }
-        output.write(copy, size);
-        output.close();
-    }
-}
-
-void generadorTextos(const string& nombre) {
-    srand(time(NULL));
-    ifstream input("../" + nombre + ".txt");
-
-    string word;
-    vector<string> words;
-
-    while (input >> word) {
-        words.push_back(word);
-    }
-
-    vector<string> copy(words.size());
-
-    for(uint i = 0; i < 20 ;++i) {
-        list<uint> indices;
-        for(uint j = 0; j < words.size(); ++j) indices.push_back(j);
-        for(uint j = 0; j < words.size(); ++j) {
-            uint indiceRandom = rand()%indices.size();
-            list<uint>::iterator iterador = indices.begin();
-            for(uint k = 0; k <indiceRandom; ++k) {
-                ++iterador;
-            }
-            copy[*iterador] = words[j];
-            indices.erase(iterador);
-        }
-
-        ofstream output("../" + nombre + "Random" + to_string(i) + ".txt");
-        for (string wordInText : copy) {
-            output << wordInText << " ";
-        }
-        output.close();
-    }
-}
-
-void leeString(string& text) {
-    cout << "Introduce la string a analizar" << endl;
-    getline(cin,text);
-    cout << "La string es: " << text << endl;
-}
-
-void testKShingles() {
-    cout << "Empieza el algoritmo de la similitud de Jaccard." << endl;
-    cout << "Introduce la k deseada." << endl;
-    int k;
-    cin >> k;
-    cout << "K es " << k << endl;
-    string text1,text2;
-    getline(cin,text1);
-    leeString(text1);
-    leeString(text2);
-    KShingleSet kshingleset1(k, text1);
-    KShingleSet kshingleset2(k, text2);
-    kshingleset1.print();
-    cout << endl;
-    kshingleset2.print();
-    cout << "El coeficiente de jaccard es " << kshingleset1.jaccard(kshingleset2) << endl;
-}
-
-void testMinHash(const vector<string>& names, PermutationMode permutationMode,bool tiempo,ofstream& writer) {
+void testMinHash(const vector<string>& names, PermutationMode permutationMode, bool tiempo, ofstream& writer) {
 
 
     steady_clock::time_point t1;
@@ -177,7 +56,7 @@ void testMinHashVariableT(const vector<string>& names, PermutationMode permutati
    // cout << "El coeficiente de jaccard es con la manera NO guay "  <<    minHashSignatures.jaccard(0, 1) << endl;
 }
 
-void primerExperimento(const vector<string>& name1, const vector<string>& name2) {
+void primerExperimentoJaccard(const vector<string>& name1, const vector<string>& name2) {
     ofstream output("../Resultados experimentos/Experimentos Jaccard Similarity/jaccardsimilarity.txt");
 
     output << "Hashed time\tHashed space\tHashed res\tNo Hashed time\tNo Hashed space\tNo Hasehd res" << endl;
@@ -221,7 +100,7 @@ void primerExperimento(const vector<string>& name1, const vector<string>& name2)
     }
 }
 
-void primerExperimento(const vector<string>& names, const string& testName) {
+void primerExperimentoJaccard(const vector<string>& names, const string& testName) {
     ofstream output("../Resultados experimentos/Experimentos Jaccard Similarity/" + testName + ".txt");
 
     output << "Hashed time\tHashed space\tHashed res\tNo Hashed time\tNo Hashed space\tNo Hasehd res" << endl;
@@ -265,22 +144,7 @@ void primerExperimento(const vector<string>& names, const string& testName) {
     }
 }
 
-void testLSH() {
 
-    const vector<vector<uint>> matrix = { {0,1,2},
-                                    {1,1,1},
-                                    {2,2,2},
-
-                                    {0,0,2},
-                                    {1,1,2},
-                                    {2,2,2},
-
-                                    {3,3,3},
-                                    {4,4,4},
-                                    {5,5,5}};
-
-    LSH lsh(matrix, 3, 3, 10);
-}
 void experimentoMinHash(const vector<string>& names,string outputFile) {
 
     ofstream writer(outputFile);
@@ -370,11 +234,10 @@ bool escogeParametrosLSH(const double thershold, const uint t, uint& b, uint& r)
 }
 
 
-
-
 void primerExperimentoLSH() {
 
-   uint k = 5;
+
+   uint k = 9;
    uint b,r;
    double treshold = 0.7;
    uint t = 50;
@@ -395,14 +258,14 @@ void primerExperimentoLSH() {
             Reader reader2(texts[j]);
             KShingleSetHashed kshingleset1(k, reader1.getText(), reader1.getfileSize());
             KShingleSetHashed kshingleset2(k, reader2.getText(), reader2.getfileSize());
-            if (kshingleset1.jaccard(kshingleset2) >= treshold) correctPairs.insert(pair<uint,uint>(i,j));
+            if (KShingleSetHashed::jaccard(kshingleset1,kshingleset2) >= treshold) correctPairs.insert(pair<uint,uint>(i,j));
         }
     }
 
     MinHashSignatures minHash(t, k,  texts, Hash32, true);
 
     ofstream writeFile("../Resultados experimentos/resultadosPrimerExpetimentoLSH.txt");
-    writeFile << "TRESHOLD\tFALSOS_POSITIVOS\tFALSOS_NEGATVOS\tPORCENTAJE_ACERTADAS\tTIEMPO"<<endl;
+    writeFile << "MOD\tFALSOS_POSITIVOS\tFALSOS_NEGATVOS\tSIMILITUD_SETS\tTIEMPO"<<endl;
 
 
     uint mod = 13;
@@ -417,13 +280,13 @@ void primerExperimentoLSH() {
 
        uint unionSize, intersectionSize;
 
-       setSimilarity(unionSize, intersectionSize, correctPairs, lsh.getSetPairs());
+       setSimilarity(unionSize, intersectionSize, correctPairs, *lsh.getSetPairs());
 
 
        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
 
-       writeFile << mod << "\t" << lsh.getSetPairs().size() - intersectionSize << "\t" <<  correctPairs.size() - intersectionSize << "\t" << (double)intersectionSize / correctPairs.size() << "\t" << time_span.count() << endl;
-        mod = MinHashSignatures::nextPrime(mod+1);
+       writeFile << mod << "\t" << lsh.getSetPairs()->size() - intersectionSize << "\t" <<  correctPairs.size() - intersectionSize << "\t" << (double)intersectionSize / unionSize << "\t" << time_span.count() << endl;
+        mod = nextPrime(mod+1);
 
    }
 }
@@ -438,13 +301,13 @@ void segundoExperimentoLSH() {
 
 
    ofstream writeFile("../Resultados experimentos/resultadosSegundoExpetimentoLSH.txt");
-   writeFile << "TRESHOLD\tB\tR\tFALSOS_POSITIVOS\tFALSOS_NEGATVOS\tPORCENTAJE_ACERTADAS\tTIEMPO"<<endl;
+   writeFile << "TRESHOLD\tB\tR\tFALSOS_POSITIVOS\tFALSOS_NEGATVOS\tSIMILTUD_SETS\tTIEMPO"<<endl;
 
    srand(time(NULL));
-   uint mod = MinHashSignatures::nextPrime(rand()%200+100);
+   uint mod =nextPrime(rand()%200+100);
    cout << mod << endl;
 
-   uint k = 5;
+   uint k = 9;
    vector<vector<double>> matrix(21,vector<double>(21));
    for (uint i = 0; i < 20; ++i) {
        Reader reader1(texts[i]);
@@ -452,7 +315,7 @@ void segundoExperimentoLSH() {
            Reader reader2(texts[j]);
            KShingleSetHashed kshingleset1(k, reader1.getText(), reader1.getfileSize());
            KShingleSetHashed kshingleset2(k, reader2.getText(), reader2.getfileSize());
-           matrix[i][j] = kshingleset1.jaccard(kshingleset2);
+           matrix[i][j] = KShingleSetHashed::jaccard(kshingleset1,kshingleset2);
        }
    }
 
@@ -481,27 +344,20 @@ void segundoExperimentoLSH() {
 
            uint unionSize, intersectionSize;
 
-           setSimilarity(unionSize, intersectionSize, correctPairs, lsh.getSetPairs());
+           setSimilarity(unionSize, intersectionSize, correctPairs, *lsh.getSetPairs());
 
 
            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
             cout <<  "TRESHOLD " << treshold << endl;
-           cout << "CORRECTAS REALES: " << correctPairs.size() << " CORRECTAS PREDECIDAS: " << intersectionSize << " CORRECTAS FALSAS: " << lsh.getSetPairs().size() - intersectionSize << " CORRECTAS NO ENCONTRADAS: " << correctPairs.size() - intersectionSize << endl;
+           cout << "CORRECTAS REALES: " << correctPairs.size() << " CORRECTAS PREDECIDAS: " << intersectionSize << " CORRECTAS FALSAS: " << lsh.getSetPairs()->size() - intersectionSize << " CORRECTAS NO ENCONTRADAS: " << correctPairs.size() - intersectionSize << endl;
            cout << endl;
-           writeFile << treshold << "\t" << b << "\t" << r << "\t" << lsh.getSetPairs().size() - intersectionSize << "\t" <<  correctPairs.size() - intersectionSize << "\t" << (double)intersectionSize / correctPairs.size() << "\t" << time_span.count() << endl;
+           writeFile << treshold << "\t" << b << "\t" << r << "\t" << lsh.getSetPairs()->size() - intersectionSize << "\t" <<  correctPairs.size() - intersectionSize << "\t" << (double)intersectionSize /unionSize << "\t" << time_span.count() << endl;
       }
 
    }
 }
 
 int main() {
-
-    vector<string> names(21);
-    names[0] = "../DataSet Experimento 1/textoDummy.txt";
-    for (int i = 1; i < names.size(); ++i) {
-        names[i] = "../DataSet Experimento 1/textoDummyRandom" + to_string(i-1) + ".txt";
-    }
-    experimentoMinHash32(names,"../Resultados experimentos/Experimentos MinHash/resultadosDummyVariableT.txt");
 
 }
 

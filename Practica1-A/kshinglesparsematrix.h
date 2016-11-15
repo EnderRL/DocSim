@@ -1,19 +1,17 @@
-#ifndef KSHINGLEMAP_H
-#define KSHINGLEMAP_H
+#ifndef KSHINGLESPARSEMATRIX_H
+#define KSHINGLESPARSEMATRIX_H
 #include <unordered_map>
 #include <unordered_set>
-using namespace std;
+#include "utils.h"
 
-typedef unsigned int uint;
 
-class KShingleMap {
+class KShingleSparseMatrix {
     int k;
 public:
     unordered_map<uint,unordered_set<uint>> mapa;
 
-    KShingleMap(int k);
+    KShingleSparseMatrix(int k);
     void add(uint document, const char* source, uint size);
-    void print();
 };
 
 #endif // KSHINGLEMAP_H

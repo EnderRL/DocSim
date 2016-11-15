@@ -1,54 +1,12 @@
 #include "minhashsignatures.h"
 
-static bool isPrime(uint number) {
-
-    if (number == 2 || number == 3)
-        return true;
-
-    if (number % 2 == 0 || number % 3 == 0)
-        return false;
-
-    uint divisor = 6;
-    while (divisor * divisor - 2 * divisor + 1 <= number) {
-
-        if (number % (divisor - 1) == 0)
-            return false;
-
-        if (number % (divisor + 1) == 0)
-            return false;
-
-        divisor += 6;
-
-    }
-
-    return true;
-
-}
-
-void garbell(vector<bool>& v){
-    v[0] = false;
-    v[1] = false;
-    for(uint i = 2; i*i <= v.size(); ++i){
-        if(v[i]){
-            for(uint j = 2*i;j < v.size(); j = j+i){
-                v[j] = false;
-            }
-        }
-    }
-}
-
-
-uint MinHashSignatures::nextPrime(uint a) {
-    while (!isPrime(a)) ++a;
-    return a;
-}
 
 matrix MinHashSignatures::getSignatures() const
 {
     return signatures;
 }
 
-void MinHashSignatures::randomPermutations(const KShingleMap &map,bool tiempo) {
+void MinHashSignatures::randomPermutations(const KShingleSparseMatrix &map,bool tiempo) {
 
     uint t = signatures.size();
     vector<list<uint>> permutationLists(t);
@@ -129,7 +87,7 @@ void MinHashSignatures::permutations32(const vector<string>& texts, uint t, uint
 MinHashSignatures::MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode,bool tiempo) {
     medida = 0;
     medidaFinal = 0;
-    KShingleMap mapa(k);
+    KShingleSparseMatrix mapa(k);
     signatures = matrix(t, vector<uint>(texts.size(), 0xFFFFFFFF));
 
     if (mode == Hash32) {

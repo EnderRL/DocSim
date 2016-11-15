@@ -1,17 +1,11 @@
 #ifndef MINHASHSIGNATURES_H
 #define MINHASHSIGNATURES_H
 
-#include <vector>
-#include <string>
-#include <iostream>
-#include <ctime>
-#include "kshingle.h"
-#include "kshinglemap.h"
 #include <unordered_set>
-#include <fstream>
-#include <list>
+#include "kshingle.h"
+#include "kshinglesparsematrix.h"
 #include "reader.h"
-using namespace std;
+#include "utils.h"
 
 enum PermutationMode {
     Hash,
@@ -20,7 +14,6 @@ enum PermutationMode {
     Random
 };
 
-typedef unsigned int uint;
 typedef vector<vector<uint>> matrix;
 
 class MinHashSignatures {
@@ -28,14 +21,12 @@ class MinHashSignatures {
     matrix signatures;
     uint medida;
     uint medidaFinal;
+    void randomPermutations(const KShingleSparseMatrix& map, bool tiempo);
+    void permutations32(const vector<string>& texts, uint t, uint k, bool tiempo);
 
-
-    void randomPermutations(const KShingleMap& map, bool tiempo);
 public:
     MinHashSignatures(uint t, uint k, const vector<string>& texts, PermutationMode mode, bool tiempo);
-    static uint nextPrime(uint number);
     double jaccard(uint a, uint b);
-    void permutations32(const vector<string>& texts, uint t, uint k, bool tiempo);
     uint size();
     uint finalSize();
     matrix getSignatures() const;
