@@ -96,5 +96,40 @@ void experimentoMinHash32(const vector<string>& names, string outputFile){
 }
 
 int main() {
+    vector<string> texts(21);
+    texts[0] = "../DataSet Experimento 1/textoDummy.txt";
+    for (int i = 1; i < 21; ++i) {
+        texts[i] = "../DataSet Experimento 1/textoDummyRandom" + to_string(i-1) + ".txt";
+    }
+    experimentoMinHash(texts,"../Resultados experimentos/Experimentos MinHash/resultadosExperimentoDummy.txt");
 
+    texts[0] = "../DataSet Experimento 1/texto50palabras.txt";
+    for (int i = 1; i < 21; ++i) {
+        texts[i] = "../DataSet Experimento 1/texto50palabrasRandom" + to_string(i-1) + ".txt";
+    }
+    experimentoMinHash(texts,"../Resultados experimentos/Experimentos MinHash/resultadosExperimento50palabras.txt");
+
+    texts[0] = "../DataSet Experimento 1/juegodetronos.txt";
+    for (int i = 1; i < 21; ++i) {
+        texts[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
+    }
+    experimentoMinHash(texts,"../Resultados experimentos/Experimentos MinHash/resultadosJuegoDeTronos.txt");
+
+    texts[0] = "../DataSet Experimento 1/textoDummy.txt";
+    for (int i = 1; i < 21; ++i) {
+        texts[i] = "../DataSet Experimento 1/textoDummyRandom" + to_string(i-1) + ".txt";
+    }
+    experimentoMinHash32(texts,"../Resultados experimentos/Experimentos MinHash/resultadosExperimentoDummyVariable.txt");
+
+    texts[0] = "../DataSet Experimento 1/texto50palabras.txt";
+    for (int i = 1; i < 21; ++i) {
+        texts[i] = "../DataSet Experimento 1/texto50palabrasRandom" + to_string(i-1) + ".txt";
+    }
+    experimentoMinHash32(texts,"../Resultados experimentos/Experimentos MinHash/resultadosExperimento50palabrasVariable.txt");
+
+    texts[0] = "../DataSet Experimento 1/juegodetronos.txt";
+    for (int i = 1; i < 21; ++i) {
+        texts[i] = "../DataSet Experimento 1/juegodetronosRandom" + to_string(i-1) + ".txt";
+    }
+    experimentoMinHash32(texts,"../Resultados experimentos/Experimentos MinHash/resultadosJuegoDeTronosVariable.txt");
 }

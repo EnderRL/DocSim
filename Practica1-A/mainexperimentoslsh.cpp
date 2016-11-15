@@ -187,5 +187,6 @@ void primerExperimentoLSH() {
 }
 
 int main() {
+    primerExperimentoLSH();
     segundoExperimentoLSH();
 }
