@@ -7,7 +7,7 @@ Docsim is a text analyzer based in minhash. It estimates the similarity between 
  - The results of different experiments are located in the folder `results`.
  
 # How to use it
- - Run the main classes located in the `src` folder. There are some texts to analyze by default, you are free to modify the paths in order to analyze other texts. 
+Run the main classes located in the `src` folder. There are some texts to analyze by default, you are free to modify the paths in order to analyze other texts. 
 
 # Documentation
 Documentation of the language is located in `DOCUMENTACIÓN DOCSIM.pdf`.
